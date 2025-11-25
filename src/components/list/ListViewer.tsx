@@ -33,6 +33,22 @@ interface ListViewerProps {
   apiBaseUrl: string;
 }
 
+// Transform image URLs that start with "uploads/" to use CloudFront
+const transformImageUrl = (imageUrl?: string): string => {
+  if (!imageUrl) return "";
+
+  // If URL starts with "uploads/", prepend CloudFront domain
+  if (imageUrl.startsWith("uploads/")) {
+    // Use environment variable or fall back to staging
+    const cloudfrontDomain =
+      import.meta.env.PUBLIC_CLOUDFRONT_DOMAIN ||
+      "on-resx-staging-media.uruguay-staging.tech";
+    return `https://${cloudfrontDomain}/${imageUrl}`;
+  }
+
+  return imageUrl;
+};
+
 function isMobileDevice(): boolean {
   if (typeof window === "undefined") return false;
 
@@ -107,6 +123,10 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
         const restaurantCountElement =
           document.getElementById("restaurant-count");
         const titleContainer = document.getElementById("title-container");
+        const titleHeading = document.getElementById("title-heading");
+        const restaurantSubtitle = document.getElementById(
+          "restaurant-subtitle",
+        );
         const divider1 = document.getElementById("divider-1");
 
         if (listData.favorites.length === 0) {
@@ -123,6 +143,38 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
           if (restaurantCountElement) {
             const count = listData.total;
             restaurantCountElement.textContent = `${count} ${count === 1 ? "Restaurant" : "Restaurants"}`;
+          }
+
+          // Animate in the title after data is loaded
+          if (titleContainer) {
+            titleContainer.classList.remove("opacity-0");
+            titleContainer.classList.add(
+              "animate-in",
+              "fill-mode-both",
+              "fade-in",
+            );
+          }
+          if (titleHeading) {
+            titleHeading.classList.add(
+              "animate-in",
+              "fill-mode-both",
+              "blur-in-sm",
+              "slide-in-from-left-3",
+              "fade-in",
+              "delay-100",
+              "duration-1000",
+              "ease-out",
+            );
+          }
+          if (restaurantSubtitle) {
+            restaurantSubtitle.classList.add(
+              "animate-in",
+              "fill-mode-both",
+              "fade-in",
+              "delay-200",
+              "duration-1000",
+              "ease-out",
+            );
           }
         }
       } catch (err) {
@@ -251,10 +303,10 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
                     {restaurant.detail?.logoUrl ||
                     restaurant.detail?.coverUrl ? (
                       <img
-                        src={
+                        src={transformImageUrl(
                           restaurant.detail.logoUrl ||
-                          restaurant.detail.coverUrl
-                        }
+                            restaurant.detail.coverUrl,
+                        )}
                         alt={restaurant.name}
                         className="h-full w-full object-cover"
                         loading="lazy"

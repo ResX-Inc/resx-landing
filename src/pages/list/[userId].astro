@@ -26,14 +26,19 @@ if (!userId) {
 >
   <!-- Section 1: Title/Subtitle with gradient background -->
   <div class="from-sand-storm/20 relative overflow-hidden bg-linear-to-tl">
-    <div id="title-container" class="relative z-10 pt-48 pb-16 text-center">
+    <div
+      id="title-container"
+      class="relative z-10 pt-48 pb-16 text-center opacity-0"
+    >
       <h1
-        class="animate-in fill-mode-both blur-in-sm slide-in-from-left-3 fade-in inline-block text-[56px] leading-[1.2] font-medium tracking-[-0.5px] text-white delay-100 duration-1000 ease-out"
+        id="title-heading"
+        class="inline-block text-[56px] leading-[1.2] font-medium tracking-[-0.5px] text-white"
       >
         <span id="user-name"></span>'s Favorites
       </h1>
       <p
-        class="animate-in fill-mode-both fade-in mt-6 text-2xl tracking-[-0.5px] text-white/50 delay-200 duration-1000 ease-out"
+        id="restaurant-subtitle"
+        class="mt-6 text-2xl tracking-[-0.5px] text-white/50"
       >
         <span id="restaurant-count"></span>
       </p>
