@@ -24,8 +24,19 @@ if (!userId) {
   title={`Favorites | ResX`}
   description="View curated favorite restaurants shared by the ResX community"
 >
-  <!-- Section 1: Title/Subtitle with gradient background -->
-  <div class="from-sand-storm/20 relative overflow-hidden bg-linear-to-tl">
+  <!-- Hide navbar and footer on mobile for this page -->
+  <style>
+    @media (max-width: 768px) {
+      nav,
+      footer {
+        display: none !important;
+      }
+    }
+  </style>
+  <!-- Section 1: Title/Subtitle with gradient background (hidden on mobile) -->
+  <div
+    class="from-sand-storm/20 relative hidden overflow-hidden bg-linear-to-tl md:block"
+  >
     <div
       id="title-container"
       class="relative z-10 pt-48 pb-16 text-center opacity-0"
@@ -45,10 +56,10 @@ if (!userId) {
     </div>
   </div>
 
-  <!-- Divider 1 -->
+  <!-- Divider 1 (hidden on mobile) -->
   <div
     id="divider-1"
-    class="relative h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
+    class="relative hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent md:block"
   >
   </div>
 
@@ -70,14 +81,16 @@ if (!userId) {
     </div>
   </div>
 
-  <!-- Divider 2 -->
+  <!-- Divider 2 (hidden on mobile) -->
   <div
-    class="relative h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
+    class="relative hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent md:block"
   >
   </div>
 
-  <!-- Section 3: Footer with Download QR Code -->
-  <div class="from-sand-storm/20 relative bg-linear-to-tl px-4 py-16">
+  <!-- Section 3: Footer with Download QR Code (hidden on mobile) -->
+  <div
+    class="from-sand-storm/20 relative hidden bg-linear-to-tl px-4 py-16 md:block"
+  >
     <div
       class="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 lg:grid-cols-2"
     >

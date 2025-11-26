@@ -49,20 +49,46 @@ const transformImageUrl = (imageUrl?: string): string => {
   return imageUrl;
 };
 
-function isMobileDevice(): boolean {
+function isMobileViewport(): boolean {
   if (typeof window === "undefined") return false;
-
-  const userAgent = navigator.userAgent || navigator.vendor;
-
-  if (/android/i.test(userAgent)) return true;
-  if (/iPad|iPhone|iPod/.test(userAgent)) return true;
-
-  const hasTouchScreen =
-    "ontouchstart" in window || navigator.maxTouchPoints > 0;
-  const isSmallScreen = window.innerWidth <= 768;
-
-  return hasTouchScreen && isSmallScreen;
+  return window.innerWidth <= 768;
 }
+
+const ResXLogo = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="103"
+    height="28"
+    fill="none"
+    viewBox="0 0 619 170"
+  >
+    <path
+      stroke="#fff"
+      strokeWidth="1"
+      strokeOpacity="0.2"
+      fill="url(#resx-fill-mobile)"
+      d="m543.9 84.211-3.1-3.2 31.4-37.8c8 4.6 18.6 3.9 25.8-1.9 8.6-6.9 11.2-18.9 6.3-28.6-.1-.2-.2-.3-.3-.5 0-.1-.1-.1-.1-.2-4.5-8.3-14.1-13.1-23.3-11.8-9.6 1.3-17.5 8.6-19.5 18.1-1.5 6.9.4 14.2 5 19.8l-30.9 37.2-3.6-3.7-53.3-56.6c-5.8-6.2-14-9.7-22.5-9.7h-11.7l74.5 79.3 4.7 5-59.5 71.7c-1.6 2-.9 4.3.6 5.6 1.5 1.3 3.9 1.5 5.6-.4l5.3-6.3 11.1 9.2.4-15.5 15.2-3.2-11.1-9.2 38-45.8 2.1 2.3 50.6 53.9c7.8 8.3 18.8 13.1 30.2 13.1h7.1l-75-80.8Zm24.6-61.9c.4-6.5 4.9-12.1 11.2-13.8.8-.2 1.6-.4 2.5-.5 5.8-.5 11.6 2.5 14.8 7.9 3.3 6.7 1.9 14.2-3.8 18.9-1.4 1.2-3.1 2.1-4.9 2.6-11.1 3.4-20.3-5.7-19.8-15.1Zm-464.1 45.9c0-19.5-15.8-30.6-37.9-30.6H0v99.1h2.5c5.3 0 9.6-4.3 9.6-9.6v-28.4h47.1l26.1 30.1c4.3 5 10.5 7.8 17.1 7.8h5.2l-33.8-38.4c18.2-2 30.6-12.8 30.6-30Zm-92.5 19.5v-39.1h53.8c16 0 26.6 6.1 26.6 19.5s-10.6 19.5-26.6 19.5H11.9v.1Zm243.8 49h-95.8v-99.1h94.4c0 6.1-4.9 11-11 11h-71.5v32.1h64.4c3 0 5.5 2.5 5.5 5.5s-2.5 5.5-5.5 5.5h-64.4v33.8h72.9c6.1.1 11 5.1 11 11.2Zm160.5-28.7c0 18.3-18.5 31.7-50.8 31.7-21.7 0-42.5-6.8-57.9-20.4 4.5-4.8 11.8-5.6 17.4-2 12.1 7.9 25.4 11.4 41.2 11.4 23.9 0 37.9-7.5 37.9-19.8 0-12-14.6-15-41.3-17.3-26.5-2.3-51.8-8.1-51.8-27.6 0-18.7 23.5-29.3 50-29.3 21.5 0 39.2 7.5 50.7 17.7-5 4.3-12.2 4.8-17.8 1.4-8.9-5.2-20-8-32.3-8.1-17.7-.1-38.4 4.8-38.4 17.8 0 12.3 18.7 14.9 42 16.7 30.2 2.4 51.1 8.2 51.1 27.8Z"
+    />
+    <defs>
+      <linearGradient
+        id="resx-fill-mobile"
+        x1="-.014"
+        x2="618.907"
+        y1="84.503"
+        y2="84.503"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#6C2D16" />
+        <stop offset=".169" stopColor="#B87C54" />
+        <stop offset=".211" stopColor="#CE9468" />
+        <stop offset=".451" stopColor="#844729" />
+        <stop offset=".64" stopColor="#D69C6F" />
+        <stop offset=".78" stopColor="#925D34" />
+        <stop offset="1" stopColor="#6C2D16" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
 
 export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
   const [data, setData] = useState<PublicListData | null>(null);
@@ -71,36 +97,18 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("right");
+  const [isMobile, setIsMobile] = useState(false);
 
   const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
-    if (isMobileDevice()) {
-      // Include cityId in deep link for city-specific favorites
-      const deepLinkUrl = cityId
-        ? `resx://list/${userId}?cityId=${cityId}`
-        : `resx://list/${userId}`;
-      const webFallbackUrl = cityId
-        ? `https://resx.co/list/${userId}?cityId=${cityId}`
-        : `https://resx.co/list/${userId}`;
+    const checkMobile = () => setIsMobile(isMobileViewport());
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
-      window.location.href = deepLinkUrl;
-
-      setTimeout(() => {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const isAndroid = /android/i.test(navigator.userAgent);
-
-        if (isIOS) {
-          window.location.href = "https://apps.apple.com/app/resx/id6470303338";
-        } else if (isAndroid) {
-          window.location.href =
-            "https://play.google.com/store/apps/details?id=com.resx.nyc";
-        }
-      }, 2500);
-
-      return;
-    }
-
+  useEffect(() => {
     const fetchList = async () => {
       try {
         // Build URL with optional cityId for city-specific filtering
@@ -129,7 +137,9 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
         );
         const divider1 = document.getElementById("divider-1");
 
-        if (listData.favorites.length === 0) {
+        const isMobileView = isMobileViewport();
+
+        if (listData.favorites.length === 0 || isMobileView) {
           if (titleContainer) titleContainer.style.display = "none";
           if (divider1) divider1.style.display = "none";
         } else {
@@ -192,22 +202,6 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
     fetchList();
   }, [userId, cityId, apiBaseUrl]);
 
-  if (isMobileDevice()) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-8">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <h2 className="text-3xl font-medium text-white">
-            Opening in ResX App...
-          </h2>
-          <p className="text-base text-white/50">
-            If the app doesn't open automatically, you'll be redirected to
-            download it.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -269,6 +263,123 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
     }
   };
 
+  const handleDownloadClick = () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      window.location.href = "https://apps.apple.com/app/resx/id6470303338";
+    } else {
+      window.location.href =
+        "https://play.google.com/store/apps/details?id=com.resx.nyc";
+    }
+  };
+
+  const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => (
+    <div className="border-b border-[#282828] p-4">
+      <div className="flex items-center gap-4">
+        <div className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
+          {restaurant.detail?.logoUrl || restaurant.detail?.coverUrl ? (
+            <img
+              src={transformImageUrl(
+                restaurant.detail.logoUrl || restaurant.detail.coverUrl,
+              )}
+              alt={restaurant.name}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="h-full w-full bg-gray-700" />
+          )}
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-[6px]">
+          <h3 className="truncate text-base leading-4 font-[860] text-white">
+            {restaurant.name}
+          </h3>
+
+          {restaurant.location?.address && (
+            <p className="truncate text-xs leading-[18px] text-[#d1d1d1]">
+              {restaurant.location.address}
+            </p>
+          )}
+
+          <div className="flex items-start gap-1 text-xs leading-[18px] text-[#d1d1d1]">
+            {restaurant.rating?.rating && (
+              <>
+                <span>★ {restaurant.rating.rating.toFixed(1)}</span>
+                {restaurant.cuisineTypes &&
+                  restaurant.cuisineTypes.length > 0 && (
+                    <>
+                      <span>•</span>
+                      <span className="truncate">
+                        {restaurant.cuisineTypes[0]}
+                      </span>
+                    </>
+                  )}
+              </>
+            )}
+            {!restaurant.rating?.rating &&
+              restaurant.cuisineTypes &&
+              restaurant.cuisineTypes.length > 0 && (
+                <span className="truncate">{restaurant.cuisineTypes[0]}</span>
+              )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="relative min-h-screen bg-[#191919] px-4 pt-12 pb-8">
+        {/* Mobile Header */}
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-medium text-white">
+              {data.userName}'s Favorites
+            </h1>
+            <p className="mt-1 text-sm text-white/50">
+              {data.total} {data.total === 1 ? "restaurant" : "restaurants"}
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <ResXLogo />
+            <button
+              onClick={handleDownloadClick}
+              className="flex items-center justify-center gap-2 rounded-full border border-[#FFD9A1] bg-[#FFD9A1] px-3 py-2 text-sm font-medium text-black"
+              style={{ width: "129px" }}
+            >
+              Download now
+            </button>
+          </div>
+        </div>
+
+        {/* Restaurant List */}
+        {data.favorites.length === 0 ? (
+          <div className="flex min-h-[50vh] items-center justify-center p-8">
+            <div className="flex max-w-md flex-col items-center gap-4 text-center">
+              <h2 className="mb-2 text-2xl font-medium text-white">
+                No Favorites Yet
+              </h2>
+              <p className="text-base leading-relaxed text-white/60">
+                This user hasn't added any favorite restaurants to their list
+                yet.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col">
+            {data.favorites.map((restaurant) => (
+              <RestaurantCard
+                key={restaurant.aliasId || restaurant.id}
+                restaurant={restaurant}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="relative overflow-hidden px-4 pt-16 pb-32">
       {data.favorites.length === 0 ? (
@@ -294,65 +405,10 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
             }`}
           >
             {currentRestaurants.map((restaurant) => (
-              <div
+              <RestaurantCard
                 key={restaurant.aliasId || restaurant.id}
-                className="border-b border-[#282828] p-4"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
-                    {restaurant.detail?.logoUrl ||
-                    restaurant.detail?.coverUrl ? (
-                      <img
-                        src={transformImageUrl(
-                          restaurant.detail.logoUrl ||
-                            restaurant.detail.coverUrl,
-                        )}
-                        alt={restaurant.name}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gray-700" />
-                    )}
-                  </div>
-
-                  <div className="flex min-w-0 flex-1 flex-col gap-[6px]">
-                    <h3 className="truncate text-base leading-4 font-[860] text-white">
-                      {restaurant.name}
-                    </h3>
-
-                    {restaurant.location?.address && (
-                      <p className="truncate text-xs leading-[18px] text-[#d1d1d1]">
-                        {restaurant.location.address}
-                      </p>
-                    )}
-
-                    <div className="flex items-start gap-1 text-xs leading-[18px] text-[#d1d1d1]">
-                      {restaurant.rating?.rating && (
-                        <>
-                          <span>★ {restaurant.rating.rating.toFixed(1)}</span>
-                          {restaurant.cuisineTypes &&
-                            restaurant.cuisineTypes.length > 0 && (
-                              <>
-                                <span>•</span>
-                                <span className="truncate">
-                                  {restaurant.cuisineTypes[0]}
-                                </span>
-                              </>
-                            )}
-                        </>
-                      )}
-                      {!restaurant.rating?.rating &&
-                        restaurant.cuisineTypes &&
-                        restaurant.cuisineTypes.length > 0 && (
-                          <span className="truncate">
-                            {restaurant.cuisineTypes[0]}
-                          </span>
-                        )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                restaurant={restaurant}
+              />
             ))}
           </div>
 
