@@ -1,0 +1,39 @@
+---
+const url = new URL(Astro.request.url);
+const promoCode = url.searchParams.get("code");
+
+const deepLink = `resx://(tabs)/account/account-management/subscription${promoCode ? `?code=${promoCode}` : ""}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting...</title>
+    <meta http-equiv="refresh" content={`0;url=${deepLink}`} />
+    <script is:inline define:vars={{ deepLink }}>
+      // Immediate redirect
+      window.location.href = deepLink;
+
+      // Fallback for mobile apps
+      setTimeout(() => {
+        window.location.href = deepLink;
+      }, 25);
+    </script>
+  </head>
+  <body>
+    <div
+      style="display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, sans-serif;"
+    >
+      <div style="text-align: center;">
+        <h1>Redirecting to RESX app...</h1>
+        <p>
+          If you are not redirected automatically, <a href={deepLink}
+            >click here</a
+          >.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
