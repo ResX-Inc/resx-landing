@@ -28,14 +28,26 @@ const deepLink = cityId
   title={`Favorites | ResX`}
   description="View curated favorite restaurants shared by the ResX community"
 >
-  <meta http-equiv="refresh" content={`0;url=${deepLink}`} slot="head" />
+  <!-- Attempt to open deep link on mobile devices -->
   <script is:inline define:vars={{ deepLink }}>
-    window.location.href = deepLink;
+    // Only attempt deep link on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      // Try to open the app via deep link
+      // If app is not installed, this will fail silently and page will render normally
+      const startTime = Date.now();
+      window.location.href = deepLink;
 
-    setTimeout(() => {
-      if (document.visibilityState === "visible") {
-      }
-    }, 500);
+      // Stop trying after 1 second - if we're still here, app isn't installed
+      setTimeout(() => {
+        const elapsed = Date.now() - startTime;
+        // If document is still visible and timeout elapsed, app isn't installed
+        // Stop trying and let the web view display
+        if (document.visibilityState === "visible" && elapsed < 1500) {
+          // Do nothing, page will render
+        }
+      }, 1000);
+    }
   </script>
 
   <!-- Hide navbar and footer on mobile for this page -->
