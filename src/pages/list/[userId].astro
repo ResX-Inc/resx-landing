@@ -18,12 +18,26 @@ const API_BASE_URL =
 if (!userId) {
   return Astro.redirect("/");
 }
+
+const deepLink = cityId
+  ? `resx://list/${userId}?cityId=${cityId}`
+  : `resx://list/${userId}`;
 ---
 
 <PageLayout
   title={`Favorites | ResX`}
   description="View curated favorite restaurants shared by the ResX community"
 >
+  <meta http-equiv="refresh" content={`0;url=${deepLink}`} slot="head" />
+  <script is:inline define:vars={{ deepLink }}>
+    window.location.href = deepLink;
+
+    setTimeout(() => {
+      if (document.visibilityState === "visible") {
+      }
+    }, 500);
+  </script>
+
   <!-- Hide navbar and footer on mobile for this page -->
   <style>
     @media (max-width: 768px) {
@@ -59,7 +73,7 @@ if (!userId) {
   <!-- Divider 1 (hidden on mobile) -->
   <div
     id="divider-1"
-    class="relative hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent md:block"
+    class="relative hidden h-px bg-linear-to-r from-transparent via-white/10 to-transparent md:block"
   >
   </div>
 
@@ -83,7 +97,7 @@ if (!userId) {
 
   <!-- Divider 2 (hidden on mobile) -->
   <div
-    class="relative hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent md:block"
+    class="relative hidden h-px bg-linear-to-r from-transparent via-white/10 to-transparent md:block"
   >
   </div>
 

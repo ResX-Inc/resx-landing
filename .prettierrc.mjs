@@ -2,7 +2,8 @@
 export default {
   plugins: [
     "prettier-plugin-astro",
-    "@prettier/plugin-oxc",
+    // Temporarily disabled due to compatibility issue with React components
+    // "@prettier/plugin-oxc",
     "prettier-plugin-tailwindcss",
   ],
   overrides: [

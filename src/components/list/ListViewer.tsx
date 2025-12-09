@@ -276,7 +276,7 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
   const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => (
     <div className="border-b border-[#282828] p-4">
       <div className="flex items-center gap-4">
-        <div className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
+        <div className="h-[84px] w-[84px] shrink-0 overflow-hidden rounded-lg bg-gray-800">
           {restaurant.detail?.logoUrl || restaurant.detail?.coverUrl ? (
             <img
               src={transformImageUrl(
@@ -291,7 +291,7 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-[6px]">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <h3 className="truncate text-base leading-4 font-[860] text-white">
             {restaurant.name}
           </h3>
@@ -438,7 +438,7 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
                     <button
                       key={page}
                       onClick={() => handlePageClick(page)}
-                      className={`flex h-[32px] min-w-[32px] items-center justify-center rounded text-sm ${
+                      className={`flex h-8 min-w-8 items-center justify-center rounded text-sm ${
                         currentPage === page
                           ? "font-medium text-white"
                           : "text-white/50 hover:text-white"
