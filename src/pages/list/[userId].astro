@@ -12,7 +12,8 @@ const { userId } = Astro.params;
 const cityId = Astro.url.searchParams.get("cityId") || undefined;
 
 // API base URL - defaults to localhost in dev, production URL otherwise
-const API_BASE_URL = "https://api.uruguay-staging.tech";
+const API_BASE_URL =
+  import.meta.env.PUBLIC_API_BASE_URL || "http://localhost:3000";
 
 if (!userId) {
   return Astro.redirect("/");
