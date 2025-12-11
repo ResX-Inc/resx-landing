@@ -2,7 +2,7 @@
 export default {
   plugins: [
     "prettier-plugin-astro",
-    "@prettier/plugin-oxc",
+    // "@prettier/plugin-oxc",
     "prettier-plugin-tailwindcss",
   ],
   overrides: [
