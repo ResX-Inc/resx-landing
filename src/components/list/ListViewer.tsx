@@ -330,7 +330,7 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
 
   if (isMobile) {
     return (
-      <div className="relative min-h-screen bg-[#191919] px-4 pt-12 pb-8">
+      <div className="relative min-h-screen bg-[#191919] px-4 pt-30 pb-8">
         {/* Mobile Header */}
         <div className="mb-6 flex items-start justify-between">
           <div>
