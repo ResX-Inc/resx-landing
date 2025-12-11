@@ -2,6 +2,7 @@
 import PageLayout from "@/layouts/PageLayout.astro";
 import { NewRestaurantsCitySelector } from "@/components/list/NewRestaurantsPage";
 import { NewRestaurantsList } from "@/components/list/NewRestaurantsList";
+import * as Download from "@/components/download";
 import restaurantsData from "@/data/restaurants/new.json";
 
 // City mapping
@@ -93,26 +94,17 @@ const totalCount = restaurants.length;
     <div
       class="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 lg:grid-cols-2"
     >
-      <!-- Left: QR Code Section -->
-      <div class="flex flex-col items-center lg:items-start">
-        <div class="flex items-center gap-6">
-          <div
-            class="before:bg-bronze bg-coal z-10 rounded-xl border border-white/10 bg-black p-2 shadow-lg"
-          >
-            <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=144x144&data=https://qrco.de/bgPQTJ"
-              alt="Download ResX App QR Code"
-              class="h-36 w-36"
-            />
-          </div>
-          <div class="space-y-1">
-            <p class="text-lg font-medium text-white">Download the ResX app</p>
-            <p class="text-sm text-white/50">
-              Scan the QR code to download for your device
-            </p>
-          </div>
-        </div>
-      </div>
+      <Download.Root
+        slot="cta"
+        class="max-lg:mt-4"
+        url="https://qrco.de/bgPQs4"
+        showSeparator={false}
+      >
+        <Download.Title>Download the ResX app</Download.Title>
+        <Download.Description>
+          Scan the QR code to download for your device
+        </Download.Description>
+      </Download.Root>
 
       <!-- Right: Description Text -->
       <div class="flex items-center justify-center lg:justify-end">
