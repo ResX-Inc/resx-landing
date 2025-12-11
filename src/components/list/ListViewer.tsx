@@ -263,16 +263,6 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
     }
   };
 
-  const handleDownloadClick = () => {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (isIOS) {
-      window.location.href = "https://apps.apple.com/app/resx/id6470303338";
-    } else {
-      window.location.href =
-        "https://play.google.com/store/apps/details?id=com.resx.nyc";
-    }
-  };
-
   const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => (
     <div className="border-b border-[#282828] p-4">
       <div className="flex items-center gap-4">
@@ -343,13 +333,13 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
           </div>
           <div className="flex flex-col items-end gap-2">
             <ResXLogo />
-            <button
-              onClick={handleDownloadClick}
+            <a
+              href="/download"
               className="flex items-center justify-center gap-2 rounded-full border border-[#FFD9A1] bg-[#FFD9A1] px-3 py-2 text-sm font-medium text-black"
               style={{ width: "129px" }}
             >
               Download now
-            </button>
+            </a>
           </div>
         </div>
 
