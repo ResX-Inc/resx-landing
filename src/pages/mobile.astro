@@ -1,0 +1,133 @@
+---
+import { getEntries } from "astro:content";
+
+export const prerender = false;
+
+const [ios, android] = await getEntries([
+  { collection: "links", id: "download-ios" },
+  { collection: "links", id: "download-android" },
+]);
+
+if (!ios || !android) {
+  throw new Error("Missing download links");
+}
+
+// Get the path parameter from the URL (e.g., /open?path=/restaurant/123)
+const path = Astro.url.searchParams.get("path") || "";
+const deeplink = `resx://${path}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opening ResX...</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #191919;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+      }
+      .spinner {
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top: 3px solid #ffd9a1;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1.5rem;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem;
+        font-weight: 600;
+      }
+      p {
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0 0 1.5rem;
+      }
+      .button {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: #ffd9a1;
+        color: #191919;
+        text-decoration: none;
+        border-radius: 9999px;
+        font-weight: 600;
+        transition: opacity 0.2s;
+      }
+      .button:hover {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="spinner"></div>
+      <h1>Opening ResX...</h1>
+      <p>If the app doesn't open automatically, tap below</p>
+      <a href={deeplink} class="button" id="manualOpen">Open ResX App</a>
+    </div>
+
+    <script
+      is:inline
+      define:vars={{
+        deeplink,
+        iosUrl: ios.data.url,
+        androidUrl: android.data.url,
+      }}
+    >
+      // Detect if user is on iOS or Android
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+
+      // Attempt to open the deeplink immediately
+      window.location.href = deeplink;
+
+      // Set a timeout to redirect to app store if deeplink fails
+      const timeout = setTimeout(() => {
+        // If we're still on this page after 2.5 seconds, the app likely isn't installed
+        if (isIOS) {
+          window.location.href = iosUrl;
+        } else if (isAndroid) {
+          window.location.href = androidUrl;
+        } else {
+          // Desktop or unknown - show download page
+          window.location.href = "/download";
+        }
+      }, 2500);
+
+      // If the page loses focus (app opened), cancel the store redirect
+      window.addEventListener("blur", () => {
+        clearTimeout(timeout);
+      });
+
+      // If user returns to the page (app didn't open), ensure store link is ready
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          clearTimeout(timeout);
+        }
+      });
+    </script>
+  </body>
+</html>
