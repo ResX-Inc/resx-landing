@@ -191,14 +191,12 @@ const intentUrl = `intent://${path}#Intent;scheme=resx;package=com.resx.nyc;end`
           });
         }
 
-        // Auto-open for normal browsers
-        if (!isInstagram) {
-          window.addEventListener("load", () => {
-            setTimeout(tryOpenApp, 100);
-          });
-        }
+        // Auto-open for all browsers (including Instagram)
+        window.addEventListener("load", () => {
+          setTimeout(tryOpenApp, 100);
+        });
 
-        // Manual button click handler
+        // Manual button click handler (backup)
         document.getElementById("manualOpen").addEventListener("click", (e) => {
           e.preventDefault();
           tryOpenApp();
