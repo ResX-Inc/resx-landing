@@ -12,9 +12,14 @@ if (!ios || !android) {
   throw new Error("Missing download links");
 }
 
-// Get the path parameter from the URL (e.g., /open?path=/restaurant/123)
+// Get the path parameter from the URL (e.g., /mobile?path=/restaurant/123)
 const path = Astro.url.searchParams.get("path") || "";
 const deeplink = `resx://${path}`;
+
+// Android Intent URL - this can sometimes bypass in-app browser restrictions
+const intentUrl = `intent://${path}#Intent;scheme=resx;package=com.resx.nyc;end`;
+
+// For iOS, we'll try multiple methods
 ---
 
 <!doctype html>
@@ -95,6 +100,7 @@ const deeplink = `resx://${path}`;
         is:inline
         define:vars={{
           deeplink,
+          intentUrl,
           iosUrl: ios.data.url,
           androidUrl: android.data.url,
         }}
@@ -111,19 +117,55 @@ const deeplink = `resx://${path}`;
           if (hasTriedOpening) return;
           hasTriedOpening = true;
 
-          // Use iframe trick for better compatibility with in-app browsers
+          // If in Instagram, skip deeplink and go straight to store
+          if (isInstagram) {
+            if (isIOS) {
+              window.location.href = iosUrl;
+            } else if (isAndroid) {
+              window.location.href = androidUrl;
+            } else {
+              window.location.href = "/download";
+            }
+            return;
+          }
+
+          // For normal browsers, try deeplink first
           const iframe = document.getElementById("hiddenIframe");
 
-          try {
-            // Try iframe first (works better in some in-app browsers)
-            iframe.src = deeplink;
+          if (isAndroid) {
+            // Android: Try intent URL first (can bypass some in-app browser restrictions)
+            try {
+              window.location.href = intentUrl;
+            } catch (e) {
+              // Fallback to regular deeplink
+              iframe.src = deeplink;
+              setTimeout(() => {
+                window.location.href = deeplink;
+              }, 25);
+            }
+          } else {
+            // iOS: Try multiple methods
+            try {
+              // Method 1: iframe
+              iframe.src = deeplink;
 
-            // Also try window.location as fallback
-            setTimeout(() => {
+              // Method 2: Direct location change
+              setTimeout(() => {
+                window.location.href = deeplink;
+              }, 25);
+
+              // Method 3: Create invisible link and click it
+              setTimeout(() => {
+                const link = document.createElement("a");
+                link.href = deeplink;
+                link.style.display = "none";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }, 50);
+            } catch (e) {
               window.location.href = deeplink;
-            }, 25);
-          } catch (e) {
-            window.location.href = deeplink;
+            }
           }
 
           // Set a timeout to redirect to app store if deeplink fails
