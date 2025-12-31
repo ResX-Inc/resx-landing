@@ -22,6 +22,7 @@ const deeplink = `resx://${path}`;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-itunes-app" content="app-id=6444920738" />
     <title>Opening ResX...</title>
     <style>
       body {
@@ -85,67 +86,82 @@ const deeplink = `resx://${path}`;
     <div class="container">
       <div class="spinner"></div>
       <h1>Opening ResX...</h1>
-      <p>If the app doesn't open automatically, tap below</p>
+      <p>Tap below to open the app</p>
       <a href={deeplink} class="button" id="manualOpen">Open ResX App</a>
-    </div>
 
-    <script
-      is:inline
-      define:vars={{
-        deeplink,
-        iosUrl: ios.data.url,
-        androidUrl: android.data.url,
-      }}
-    >
-      // Detect if user is on iOS or Android
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isAndroid = /Android/.test(navigator.userAgent);
+      <iframe id="hiddenIframe" style="display:none"></iframe>
 
-      // Detect if running in Instagram's in-app browser
-      const isInstagram = /instagram/i.test(navigator.userAgent);
+      <script
+        is:inline
+        define:vars={{
+          deeplink,
+          iosUrl: ios.data.url,
+          androidUrl: android.data.url,
+        }}
+      >
+        // Detect if user is on iOS or Android
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isInstagram = /instagram/i.test(navigator.userAgent);
 
-      let timeout;
+        let timeout;
+        let hasTriedOpening = false;
 
-      function tryOpenApp() {
-        // Try to open the deeplink
-        window.location.href = deeplink;
+        function tryOpenApp() {
+          if (hasTriedOpening) return;
+          hasTriedOpening = true;
 
-        // Set a timeout to redirect to app store if deeplink fails
-        timeout = setTimeout(() => {
-          // If we're still on this page after 2.5 seconds, the app likely isn't installed
-          if (isIOS) {
-            window.location.href = iosUrl;
-          } else if (isAndroid) {
-            window.location.href = androidUrl;
-          } else {
-            // Desktop or unknown - show download page
-            window.location.href = "/download";
+          // Use iframe trick for better compatibility with in-app browsers
+          const iframe = document.getElementById("hiddenIframe");
+
+          try {
+            // Try iframe first (works better in some in-app browsers)
+            iframe.src = deeplink;
+
+            // Also try window.location as fallback
+            setTimeout(() => {
+              window.location.href = deeplink;
+            }, 25);
+          } catch (e) {
+            window.location.href = deeplink;
           }
-        }, 2500);
 
-        // If the page loses focus (app opened), cancel the store redirect
-        window.addEventListener("blur", () => {
-          clearTimeout(timeout);
-        });
+          // Set a timeout to redirect to app store if deeplink fails
+          timeout = setTimeout(() => {
+            if (isIOS) {
+              window.location.href = iosUrl;
+            } else if (isAndroid) {
+              window.location.href = androidUrl;
+            } else {
+              window.location.href = "/download";
+            }
+          }, 2500);
 
-        // If user returns to the page (app didn't open), ensure store link is ready
-        document.addEventListener("visibilitychange", () => {
-          if (document.hidden) {
+          // Cancel store redirect if app opened
+          window.addEventListener("blur", () => {
             clearTimeout(timeout);
-          }
-        });
-      }
+          });
 
-      // Only auto-redirect if NOT in Instagram browser
-      if (!isInstagram) {
-        tryOpenApp();
-      } else {
-        // In Instagram, wait for user tap on the button
+          document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+              clearTimeout(timeout);
+            }
+          });
+        }
+
+        // Auto-open for normal browsers
+        if (!isInstagram) {
+          window.addEventListener("load", () => {
+            setTimeout(tryOpenApp, 100);
+          });
+        }
+
+        // Manual button click handler
         document.getElementById("manualOpen").addEventListener("click", (e) => {
           e.preventDefault();
           tryOpenApp();
         });
-      }
-    </script>
+      </script>
+    </div>
   </body>
 </html>
