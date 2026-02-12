@@ -28,9 +28,4 @@ nishtha:
   alert: "Lei"
   image: "../assets/headshots/nishtha.png"
 
-utkarsh:
-  name: "Utkarsh Uppal"
-  color: "umbra"
-  size: "default"
-  alert: "4 Charles Prime Rib"
-  image: "../assets/headshots/utkarsh.png"
+
