@@ -3,8 +3,8 @@ mena:
   role: "Co-founder"
   color: "bronze"
   size: "lg"
-  alert: "Tatiana"
-  image: "../assets/headshots/mena.png"
+  alert: "Bistrot Ha"
+  image: "../assets/headshots/mena-latest.jpg"
 
 sarah:
   name: "Sarah Goldring"
@@ -12,7 +12,7 @@ sarah:
   color: "bronze"
   size: "lg"
   alert: "Red Hook Tavern"
-  image: "../assets/headshots/sarah.png"
+  image: "../assets/headshots/sarah-new.png"
 
 erika:
   name: "Erika Bloes"
