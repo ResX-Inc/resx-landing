@@ -3,4 +3,5 @@ default:
     - about
     - submit
     - claim
+    - merch
   cta: download
