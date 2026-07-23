@@ -5,4 +5,10 @@ pages:
   - home
 ---
 
-Head to the <u>Alerts tab</u> to create and manage your alerts. When a matching reservation is posted, you'll get a push notification. Premium users can set multiple, more customized alerts and receive notifications before general users.
+To set an alert, click here or open your ResX App, tap the alert icon in the bottom right on your ResX app and choose either 'Discover' or 'Restaurant'.
+
+There are two ways to set an alert, depending on what you're after:
+
+Discover - for when you know what you want but not where. Set your cuisine, neighborhood, and party size, and you'll get notified as soon as a matching reservation opens up.
+
+Restaurant - for when you have one spot in mind. Set an alert for that specific restaurant and you'll be notified the second your dates are available.
