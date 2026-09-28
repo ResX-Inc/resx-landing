@@ -4,10 +4,16 @@ import Navigation from "@/components/Navigation.astro";
 
 import BaseLayout from "./BaseLayout.astro";
 
-const { frontmatter } = Astro.props;
+const { frontmatter } = Astro.props as {
+  frontmatter: {
+    title: string;
+    jsonLd?: Record<string, unknown>[];
+  };
+};
+const jsonLd = frontmatter.jsonLd ?? [];
 ---
 
-<BaseLayout templated title={frontmatter.title}>
+<BaseLayout templated title={frontmatter.title} jsonLd={jsonLd}>
   <main>
     <Navigation />
     <article

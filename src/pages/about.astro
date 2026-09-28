@@ -23,12 +23,196 @@ const faqs = await getCollection("faq", (entry) =>
 );
 
 const teamMembers = await getCollection("team");
+
+const aboutJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "AboutPage",
+        "@id": "https://resx.co/about#webpage",
+        url: "https://resx.co/about",
+        name: "About | ResX",
+        description:
+          "At ResX, our mission is to make the exclusive accessible to everyone.",
+        isPartOf: { "@id": "https://resx.co/#website" },
+        publisher: { "@id": "https://resx.co/#organization" },
+        inLanguage: "en-US",
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: "https://resx.co/og.jpg",
+        },
+        breadcrumb: { "@id": "https://resx.co/about#breadcrumb" },
+        about: { "@id": "https://resx.co/#organization" },
+        mainEntity: { "@id": "https://resx.co/#organization" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://resx.co/about#breadcrumb",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://resx.co/",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "About Us",
+            item: "https://resx.co/about",
+          },
+        ],
+      },
+      {
+        "@id": "https://resx.co/#organization",
+        knowsAbout: [
+          "Restaurant reservations",
+          "Last-minute dining",
+          "New York City restaurants",
+          "London restaurants",
+        ],
+        founder: [
+          {
+            "@type": "Person",
+            name: "Mena Barakat",
+            worksFor: { "@id": "https://resx.co/#organization" },
+            jobTitle: "Co-founder",
+          },
+          {
+            "@type": "Person",
+            name: "Sarah Goldring",
+            worksFor: { "@id": "https://resx.co/#organization" },
+            jobTitle: "Co-founder",
+          },
+        ],
+        employee: [
+          {
+            "@type": "Person",
+            name: "Mena Barakat",
+            worksFor: { "@id": "https://resx.co/#organization" },
+            jobTitle: "Co-founder",
+          },
+          {
+            "@type": "Person",
+            name: "Sarah Goldring",
+            worksFor: { "@id": "https://resx.co/#organization" },
+            jobTitle: "Co-founder",
+          },
+          {
+            "@type": "Person",
+            name: "Erika Bloes",
+            worksFor: { "@id": "https://resx.co/#organization" },
+          },
+          {
+            "@type": "Person",
+            name: "Nishtha Dalal",
+            worksFor: { "@id": "https://resx.co/#organization" },
+          },
+        ],
+        disambiguatingDescription:
+          "What began as an Instagram account helping people share their last-minute reservations has grown into an app connecting diners to the city's most sought-after tables in both NYC and London. ResX was founded by regular people, for regular people, to bring back the flexibility of last-minute planning.",
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://resx.co/#organization",
+        name: "ResX",
+        legalName: "ResX Inc.",
+        url: "https://resx.co/",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://resx.co/_astro/logo.D8pgYnSP.svg",
+        },
+        image: "https://resx.co/og.jpg",
+        slogan: "Good things happen last minute",
+        description:
+          "ResX is a peer-to-peer reservation exchange where diners claim last-minute reservations at in-demand restaurants and submit reservations they can't make, so they avoid cancellation fees. Every reservation is shared by another ResX user. ResX does not buy or sell reservations and does not use bots.",
+        areaServed: [
+          {
+            "@type": "City",
+            name: "New York",
+            sameAs: "https://en.wikipedia.org/wiki/New_York_City",
+          },
+          {
+            "@type": "City",
+            name: "London",
+            sameAs: "https://en.wikipedia.org/wiki/London",
+          },
+        ],
+        email: "support@resx.co",
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "support@resx.co",
+        },
+        sameAs: [
+          "https://www.instagram.com/resx.nyc/",
+          "https://www.tiktok.com/@resxapp",
+          "https://www.linkedin.com/company/resxapp",
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        owns: { "@id": "https://resx.co/#app" },
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://resx.co/#website",
+        url: "https://resx.co/",
+        name: "ResX",
+        description:
+          "Claim last minute reservations. Trade in reservations you can't make.",
+        publisher: { "@id": "https://resx.co/#organization" },
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "MobileApplication",
+        "@id": "https://resx.co/#app",
+        name: "ResX",
+        alternateName: "ResX: Reservations On Demand",
+        description:
+          "A free, peer-to-peer exchange to give and take last-minute restaurant reservations at in-demand restaurants in New York and London. No resale, no bots - just diners helping diners.",
+        operatingSystem: "iOS, Android",
+        applicationCategory: "LifestyleApplication",
+        applicationSubCategory: "Food & Drink",
+        installUrl: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        sameAs: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        publisher: { "@id": "https://resx.co/#organization" },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          description:
+            "Free to download. ResX Premium is available as an in-app subscription.",
+        },
+        featureList: [
+          "Claim last-minute reservations submitted by other diners",
+          "Submit reservations you can't use and avoid cancellation fees",
+          "Restaurant Alerts and Discover Alerts for matching reservations",
+          "ResX Rewards: earn tokens and redeem perks like Front of the Line",
+          "ResX Premium: early access, more alerts, priority notifications",
+        ],
+      },
+    ],
+  },
+];
 ---
 
 <PageLayout
   title="About"
   description="At ResX, our mission is to make the exclusive accessible to everyone."
   templated
+  jsonLd={aboutJsonLd}
 >
   {/* Hero Section */}
 

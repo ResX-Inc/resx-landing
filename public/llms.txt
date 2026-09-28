@@ -1,0 +1,30 @@
+# ResX
+
+> ResX is a free, peer-to-peer reservation exchange for last-minute restaurant reservations in New York and London. Diners claim tables that other members can't use, and submit reservations they can't make to avoid cancellation fees. Every reservation is shared by another ResX user. ResX does not buy or sell reservations, is not affiliated with restaurants, and does not use bots.
+
+Key facts:
+
+- Available on iOS and Android. Free to use; ResX Premium is an optional in-app subscription.
+- Claimed reservations stay under the original holder's name. The claimer receives the name and confirmation two hours before the reservation time.
+- Returning a claimed reservation within five minutes carries no fee. After that, if no one else claims it, the claimer may owe listed cancellation or no-show fees.
+- Basic members see reservations for today and tomorrow and can set one alert. Premium members see up to 5 days out, get priority alerts, and can set up to five alerts.
+- ResX Rewards: members earn tokens by submitting reservations, referring friends, and leaving reviews, and redeem them for perks such as Front of the Line.
+- Support: [support@resx.co](mailto:support@resx.co)
+
+## Pages
+
+- [Home](https://resx.co/): Overview of ResX, how it works, and ResX Premium
+- [Claim](https://resx.co/claim): How to find and claim last-minute reservations
+- [Submit](https://resx.co/submit): How to share a reservation you can't make and avoid cancellation fees
+- [FAQ](https://resx.co/faq): Full answers on claiming, submitting, alerts, Premium, and Rewards
+- [About](https://resx.co/about): Mission and team (co-founders Mena Barakat and Sarah Goldring)
+
+## Apps
+
+- [iOS App Store](https://apps.apple.com/us/app/resx/id6444920738)
+- [Google Play](https://play.google.com/store/apps/details?id=com.resx.nyc)
+
+## Optional
+
+- [Privacy Policy](https://resx.co/privacy-policy)
+- [Terms of Use](https://resx.co/terms-of-use)

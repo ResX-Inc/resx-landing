@@ -30,12 +30,176 @@ import Glow from "@/components/Glow.astro";
 const faqs = await getCollection("faq", (entry) => {
   return entry.data.pages?.includes("home");
 });
+
+const claimJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://resx.co/claim#webpage",
+        url: "https://resx.co/claim",
+        name: "Claim | ResX",
+        description:
+          "Nab last-minute tables at the most in-demand restaurants.",
+        isPartOf: { "@id": "https://resx.co/#website" },
+        publisher: { "@id": "https://resx.co/#organization" },
+        inLanguage: "en-US",
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: "https://resx.co/og.jpg",
+        },
+        breadcrumb: { "@id": "https://resx.co/claim#breadcrumb" },
+        about: { "@id": "https://resx.co/#app" },
+        mainEntity: { "@id": "https://resx.co/claim#howto" },
+        relatedLink: "https://resx.co/faq",
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://resx.co/claim#breadcrumb",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://resx.co/",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Claim",
+            item: "https://resx.co/claim",
+          },
+        ],
+      },
+      {
+        "@type": "HowTo",
+        "@id": "https://resx.co/claim#howto",
+        name: "How to claim a last-minute restaurant reservation on ResX",
+        description:
+          "Snag the coveted tables that other diners can't use. No connections, no waitlists, no hassle.",
+        tool: { "@type": "HowToTool", name: "ResX app (iOS or Android)" },
+        step: [
+          {
+            "@type": "HowToStep",
+            position: 1,
+            name: "Discover",
+            text: "Browse last-minute tables submitted by our community of diners.",
+          },
+          {
+            "@type": "HowToStep",
+            position: 2,
+            name: "Claim",
+            text: "See a spot you like? Secure your reservation instantly with just a few taps.",
+          },
+          {
+            "@type": "HowToStep",
+            position: 3,
+            name: "You're In",
+            text: "Get confirmed 2 hours beforehand & ask the original submitter any questions you have.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://resx.co/#organization",
+        name: "ResX",
+        legalName: "ResX Inc.",
+        url: "https://resx.co/",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://resx.co/_astro/logo.D8pgYnSP.svg",
+        },
+        image: "https://resx.co/og.jpg",
+        slogan: "Good things happen last minute",
+        description:
+          "ResX is a peer-to-peer reservation exchange where diners claim last-minute reservations at in-demand restaurants and submit reservations they can't make, so they avoid cancellation fees. Every reservation is shared by another ResX user. ResX does not buy or sell reservations and does not use bots.",
+        areaServed: [
+          {
+            "@type": "City",
+            name: "New York",
+            sameAs: "https://en.wikipedia.org/wiki/New_York_City",
+          },
+          {
+            "@type": "City",
+            name: "London",
+            sameAs: "https://en.wikipedia.org/wiki/London",
+          },
+        ],
+        email: "support@resx.co",
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "support@resx.co",
+        },
+        sameAs: [
+          "https://www.instagram.com/resx.nyc/",
+          "https://www.tiktok.com/@resxapp",
+          "https://www.linkedin.com/company/resxapp",
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        owns: { "@id": "https://resx.co/#app" },
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://resx.co/#website",
+        url: "https://resx.co/",
+        name: "ResX",
+        description:
+          "Claim last minute reservations. Trade in reservations you can't make.",
+        publisher: { "@id": "https://resx.co/#organization" },
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "MobileApplication",
+        "@id": "https://resx.co/#app",
+        name: "ResX",
+        alternateName: "ResX: Reservations On Demand",
+        description:
+          "A free, peer-to-peer exchange to give and take last-minute restaurant reservations at in-demand restaurants in New York and London. No resale, no bots - just diners helping diners.",
+        operatingSystem: "iOS, Android",
+        applicationCategory: "LifestyleApplication",
+        applicationSubCategory: "Food & Drink",
+        installUrl: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        sameAs: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        publisher: { "@id": "https://resx.co/#organization" },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          description:
+            "Free to download. ResX Premium is available as an in-app subscription.",
+        },
+        featureList: [
+          "Claim last-minute reservations submitted by other diners",
+          "Submit reservations you can't use and avoid cancellation fees",
+          "Restaurant Alerts and Discover Alerts for matching reservations",
+          "ResX Rewards: earn tokens and redeem perks like Front of the Line",
+          "ResX Premium: early access, more alerts, priority notifications",
+        ],
+      },
+    ],
+  },
+];
 ---
 
 <PageLayout
   title="Claim"
   description="Nab last-minute tables at the most in-demand restaurants."
   templated
+  jsonLd={claimJsonLd}
 >
   {/* Hero Section */}
 

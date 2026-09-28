@@ -30,11 +30,283 @@ import PageLayout from "@/layouts/PageLayout.astro";
 
 const testimonials = await getCollection("testimonials");
 const articles = await getCollection("articles");
+
+const homepageJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://resx.co/#webpage",
+        url: "https://resx.co/",
+        name: "ResX | Good things happen last minute",
+        description:
+          "Claim last minute reservations. Trade in reservations you can't make.",
+        isPartOf: { "@id": "https://resx.co/#website" },
+        publisher: { "@id": "https://resx.co/#organization" },
+        inLanguage: "en-US",
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: "https://resx.co/og.jpg",
+        },
+        about: { "@id": "https://resx.co/#organization" },
+        mainEntity: { "@id": "https://resx.co/#app" },
+        hasPart: { "@id": "https://resx.co/#featured-restaurants" },
+        significantLink: [
+          "https://resx.co/claim",
+          "https://resx.co/submit",
+          "https://resx.co/faq",
+          "https://resx.co/about",
+        ],
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://resx.co/#featured-restaurants",
+        name: "Restaurants featured on ResX",
+        description:
+          "A sample of in-demand restaurants whose reservations are shared on ResX.",
+        numberOfItems: 23,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            item: { "@type": "Restaurant", name: "4 Charles Prime Rib" },
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            item: { "@type": "Restaurant", name: "Berenjak" },
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            item: { "@type": "Restaurant", name: "Bottarga" },
+          },
+          {
+            "@type": "ListItem",
+            position: 4,
+            item: { "@type": "Restaurant", name: "Carbone" },
+          },
+          {
+            "@type": "ListItem",
+            position: 5,
+            item: { "@type": "Restaurant", name: "The Corner Store" },
+          },
+          {
+            "@type": "ListItem",
+            position: 6,
+            item: { "@type": "Restaurant", name: "Cote Korean Steakhouse" },
+          },
+          {
+            "@type": "ListItem",
+            position: 7,
+            item: { "@type": "Restaurant", name: "Don Angie" },
+          },
+          {
+            "@type": "ListItem",
+            position: 8,
+            item: { "@type": "Restaurant", name: "Din Tai Fung" },
+          },
+          {
+            "@type": "ListItem",
+            position: 9,
+            item: { "@type": "Restaurant", name: "Gymkhana" },
+          },
+          {
+            "@type": "ListItem",
+            position: 10,
+            item: { "@type": "Restaurant", name: "Hillstone" },
+          },
+          {
+            "@type": "ListItem",
+            position: 11,
+            item: { "@type": "Restaurant", name: "L'Artusi" },
+          },
+          {
+            "@type": "ListItem",
+            position: 12,
+            item: { "@type": "Restaurant", name: "Minetta Tavern" },
+          },
+          {
+            "@type": "ListItem",
+            position: 13,
+            item: { "@type": "Restaurant", name: "Misi" },
+          },
+          {
+            "@type": "ListItem",
+            position: 14,
+            item: { "@type": "Restaurant", name: "Monkey Bar" },
+          },
+          {
+            "@type": "ListItem",
+            position: 15,
+            item: { "@type": "Restaurant", name: "Nina" },
+          },
+          {
+            "@type": "ListItem",
+            position: 16,
+            item: { "@type": "Restaurant", name: "Raoul's" },
+          },
+          {
+            "@type": "ListItem",
+            position: 17,
+            item: { "@type": "Restaurant", name: "Redhook Tavern" },
+          },
+          {
+            "@type": "ListItem",
+            position: 18,
+            item: { "@type": "Restaurant", name: "San Sabino" },
+          },
+          {
+            "@type": "ListItem",
+            position: 19,
+            item: { "@type": "Restaurant", name: "Semma" },
+          },
+          {
+            "@type": "ListItem",
+            position: 20,
+            item: { "@type": "Restaurant", name: "Straker's" },
+          },
+          {
+            "@type": "ListItem",
+            position: 21,
+            item: { "@type": "Restaurant", name: "Tatiana" },
+          },
+          {
+            "@type": "ListItem",
+            position: 22,
+            item: { "@type": "Restaurant", name: "Thai Diner" },
+          },
+          {
+            "@type": "ListItem",
+            position: 23,
+            item: { "@type": "Restaurant", name: "The Devonshire" },
+          },
+        ],
+      },
+      {
+        "@id": "https://resx.co/#organization",
+        subjectOf: [
+          {
+            "@type": "NewsArticle",
+            name: "Restaurant owners are fed up with reservation hoarding bots",
+            url: "https://www.bloomberg.com/news/articles/2023-10-25/new-york-restaurants-bars-fight-back-against-reservations-by-bots",
+            datePublished: "2023-10-25",
+            publisher: { "@type": "Organization", name: "Bloomberg" },
+          },
+          {
+            "@type": "NewsArticle",
+            name: "Digital sellers want to help you land the hardest reservations in town",
+            url: "https://www.grubstreet.com/2023/04/impossible-reservations-resx-dorsia-appointment-trader.html",
+            publisher: { "@type": "Organization", name: "Grub Street" },
+          },
+          {
+            "@type": "Article",
+            name: "The Most Sought-Out Reservations In NYC, According To ResX",
+            url: "https://www.modernluxury.com/toughest-reservations-nyc",
+            publisher: { "@type": "Organization", name: "Modern Luxury" },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://resx.co/#organization",
+        name: "ResX",
+        legalName: "ResX Inc.",
+        url: "https://resx.co/",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://resx.co/_astro/logo.D8pgYnSP.svg",
+        },
+        image: "https://resx.co/og.jpg",
+        slogan: "Good things happen last minute",
+        description:
+          "ResX is a peer-to-peer reservation exchange where diners claim last-minute reservations at in-demand restaurants and submit reservations they can't make, so they avoid cancellation fees. Every reservation is shared by another ResX user. ResX does not buy or sell reservations and does not use bots.",
+        areaServed: [
+          {
+            "@type": "City",
+            name: "New York",
+            sameAs: "https://en.wikipedia.org/wiki/New_York_City",
+          },
+          {
+            "@type": "City",
+            name: "London",
+            sameAs: "https://en.wikipedia.org/wiki/London",
+          },
+        ],
+        email: "support@resx.co",
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "support@resx.co",
+        },
+        sameAs: [
+          "https://www.instagram.com/resx.nyc/",
+          "https://www.tiktok.com/@resxapp",
+          "https://www.linkedin.com/company/resxapp",
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        owns: { "@id": "https://resx.co/#app" },
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://resx.co/#website",
+        url: "https://resx.co/",
+        name: "ResX",
+        description:
+          "Claim last minute reservations. Trade in reservations you can't make.",
+        publisher: { "@id": "https://resx.co/#organization" },
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "MobileApplication",
+        "@id": "https://resx.co/#app",
+        name: "ResX",
+        alternateName: "ResX: Reservations On Demand",
+        description:
+          "A free, peer-to-peer exchange to give and take last-minute restaurant reservations at in-demand restaurants in New York and London. No resale, no bots - just diners helping diners.",
+        operatingSystem: "iOS, Android",
+        applicationCategory: "LifestyleApplication",
+        applicationSubCategory: "Food & Drink",
+        installUrl: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        sameAs: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        publisher: { "@id": "https://resx.co/#organization" },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          description:
+            "Free to download. ResX Premium is available as an in-app subscription.",
+        },
+        featureList: [
+          "Claim last-minute reservations submitted by other diners",
+          "Submit reservations you can't use and avoid cancellation fees",
+          "Restaurant Alerts and Discover Alerts for matching reservations",
+          "ResX Rewards: earn tokens and redeem perks like Front of the Line",
+          "ResX Premium: early access, more alerts, priority notifications",
+        ],
+      },
+    ],
+  },
+];
 ---
 
 <PageLayout
   title="ResX | Good things happen last minute"
   description="Claim last minute reservations. Trade in reservations you can't make."
+  jsonLd={homepageJsonLd}
 >
   {/* Hero Section */}
 
@@ -51,8 +323,8 @@ const articles = await getCollection("articles");
     </Hero.Title>
 
     <Hero.Subtitle slot="subtitle">
-      <strong>Never miss out on the best tables.</strong> Claim last-minute openings
-      or submit reservations you can't make.
+      <strong>Never miss out on the best tables.</strong> Claim reservations other
+      people can't make, or submit yours when your plans change.
     </Hero.Subtitle>
 
     <Download.Root slot="cta" url="https://qrco.de/bgPQTJ">

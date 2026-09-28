@@ -12,6 +12,7 @@ export interface Props {
   templated?: boolean;
   authors?: string[];
   publishedTime?: string;
+  jsonLd?: Record<string, unknown>[];
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -23,6 +24,7 @@ const {
   publishedTime,
   description,
   image = "/og.jpg",
+  jsonLd = [],
 } = Astro.props;
 ---
 
@@ -64,3 +66,9 @@ const {
     image: new URL(image, Astro.url).href,
   }}
 />
+
+{
+  jsonLd.map((item) => (
+    <script type="application/ld+json" set:html={JSON.stringify(item)} />
+  ))
+}

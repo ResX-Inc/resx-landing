@@ -179,27 +179,351 @@ const sections: FAQSection[] = [
   },
 ];
 
-// Generate JSON-LD FAQ structured data
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: sections.flatMap((section) =>
-    section.items.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer.replace(/\*\*(.+?)\*\*/g, "$1"), // Strip markdown bold
+const faqJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        "@id": "https://resx.co/faq#webpage",
+        url: "https://resx.co/faq",
+        name: "FAQ | ResX",
+        description:
+          "Answers to common questions about ResX, claiming and submitting reservations, alerts, and more.",
+        isPartOf: { "@id": "https://resx.co/#website" },
+        publisher: { "@id": "https://resx.co/#organization" },
+        about: { "@id": "https://resx.co/#app" },
+        inLanguage: "en-US",
+        breadcrumb: { "@id": "https://resx.co/faq#breadcrumb" },
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: "What is ResX?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX is a peer-to-peer platform for accessing last-minute and hard-to-get reservations and experiences. Everything on ResX is shared by another user who can no longer make their booking and wants to pass it along.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Where do ResX reservations come from?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "All reservations on ResX are submitted by members of our community. When someone has a reservation they can no longer use, they can share it on ResX for another member to claim.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Is ResX affiliated with restaurants?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX is an independent, peer-to-peer community.\n\nWe do not own restaurant inventory, access restaurant booking systems, or hold tables ourselves. Every reservation comes directly from another ResX user.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Does ResX buy or sell restaurant reservations?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX is a reservation exchange, not a resale marketplace.\n\nStandard reservations are passed from one diner to another without someone purchasing the table itself. Some reservations may include prepaid deposits or cancellation fees, which will be clearly listed.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Where is ResX available?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX is currently live in New York and London, with more cities coming soon.\n\nThat said, ResX isn't limited to those cities. You can submit an in-demand reservation or experience anywhere — and if someone in our community is looking for it, they can claim it.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What happens when I claim a reservation?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "The reservation will appear under My Reservations → Claimed.\n\nBecause you're claiming another member's booking, the reservation will remain under the original reservation holder's name. Two hours before the reservation time, we'll send you the name the reservation is under and the reservation confirmation, both in the app and via text.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What happens if I claim a reservation but can't make it?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Please return the reservation to the ResX feed as soon as possible to give another member a chance to claim it.\n\nGo to My Reservations → Claimed → Select the reservation → \"Can't make this reservation anymore?\"\n\nIf you return a reservation within five minutes of claiming it, you won't be responsible for any cancellation fees. After five minutes, if no one else claims the reservation, you may be responsible for any applicable cancellation or no-show fees.\n\nThe sooner you return it, the better the chance another member can use the reservation.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Can I contact the person who submitted or claimed my reservation?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Yes. You can contact them directly through the app using a masked number, so your personal phone number stays private.\n\nGo to My Reservations, open the reservation, and select Contact Submitter or Contact Claimer.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Do I have to pay for reservations I claim?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX does not buy or sell reservations. There is no fee paid to another member for claiming their reservation.\n\nSome restaurants require a booking fee or deposit when the reservation is originally made. If you claim one of these reservations, we'll reimburse the original reservation holder for that amount. Depending on the restaurant, the fee may be non-refundable or the deposit may be applied toward your final bill.\n\nYou may also see a temporary $1.99 hold on your card after claiming a reservation. This is simply used to verify your card on file and will automatically fall off — it is not a charge.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "How do I submit a reservation I can't use?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Submit your reservation through the ResX app, making sure all details match your original booking. Be sure to include any important details, such as bar seating, outdoor/patio seating, deposits, or cancellation and no-show fees.\n\nWe'll verify your submission against your reservation confirmation, and you'll be notified once it's approved and live on the ResX feed, as well as when another member claims it.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Can I take my reservation back after submitting it?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Yes. If your reservation hasn't been claimed yet, you can take it back at any time.\n\nIf it has been claimed, you have 30 minutes from the time it was claimed to take it back through the app. After 30 minutes, the reservation is committed to the claimer and can no longer be taken back.\n\nIf the restaurant cancels the reservation or another issue comes up after that window, please contact the claimer or ResX Support as soon as possible.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What happens if someone claims my reservation and then returns it?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "If someone can no longer use your reservation, it will be returned to the ResX feed so another member has a chance to claim it.\n\nIf the reservation was held for more than five minutes and no one else claims it, the latest claimer will be responsible for any cancellation or no-show fees you listed with your submission.\n\nIf you're charged by the restaurant, our team will reach out to confirm the charge and coordinate reimbursement. You can also contact ResX Support directly if you've been charged.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What happens if my reservation is claimed and no one shows up?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Mark the reservation as a no-show in the app.\n\nThe claimer will be charged any applicable cancellation or no-show fees that were included in your listing. Our team will follow up within one to two days to confirm the charge and make sure you are reimbursed.\n\nUsers with repeated no-shows may be suspended from ResX, regardless of whether a fee was attached to the reservation.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "How do I make sure I'm reimbursed for a cancellation or no-show fee?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "As long as you accurately list any cancellation or no-show fees when submitting your reservation, you're covered.\n\nIf a claimer becomes responsible for a listed fee and the restaurant charges you, ResX will reimburse you for the eligible charge.\n\nOur team will typically reach out to confirm whether you were charged, but you can also contact ResX Support directly if you receive a charge.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "My reservation has a prepaid deposit. How do I get reimbursed?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "When submitting your reservation, make sure to include the prepaid deposit amount. This amount will be clearly disclosed to the claimer before they claim the reservation.\n\nOnce your reservation is claimed and used, ResX will reimburse you for the prepaid amount via Venmo.\n\nIf you don't use Venmo or have any questions about your reimbursement, contact ResX Support and we'll be happy to help.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "How do alerts work?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Head to the Alerts tab to create and manage your alerts.\n\nWhen another ResX user posts a reservation that matches your selections, you'll receive a push notification so you can claim it.\n\nCertain ResX Rewards, including Front of the Line, can be applied to give an alert priority.\n\nPremium users can set up to five alerts at a time, while Basic users can set one.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What's the difference between a Restaurants Alert and a Discover Alert?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Restaurant Alerts are for when you already know where you want to go. Select up to five restaurants and choose your preferred date, time, and party size, and we'll notify you when a matching reservation is posted.\n\nDiscover Alerts are for when you know what you're looking for, but not necessarily the restaurant. Choose your preferred date, time, and party size, then narrow your search by things like cuisine, neighborhood, and dining tags — or keep it broad to see more options.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "How many alerts can I have?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Basic accounts can have one active alert at a time.\n\nPremium accounts can have up to five active alerts across Restaurants and Discover Alerts combined.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What happens when an alert expires?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Good news, expired alerts are not deleted. You can reactivate them at any time from the Expired tab.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Why didn't I receive a notification for a reservation?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "First, make sure push notifications are enabled for ResX in your phone settings so we can notify you when a reservation matches your alerts.\n\nIf notifications are enabled, the reservation may not have matched all of your alert criteria.\n\nKeep in mind that popular reservations can be claimed within seconds. Premium members receive alerts before Basic members, and Alert Boosts provide an additional head start.\n\nIf your notifications are enabled but you're still not receiving alerts, try deleting and reinstalling the ResX app. When prompted to allow notifications, be sure to select Allow.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Can ResX guarantee that I'll get a reservation?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX inventory is entirely community-driven, so availability depends on what other diners submit. While we can't guarantee a specific reservation will become available, setting alerts for multiple restaurants and keeping your notifications on will give you the best chance.\n\nThe more you engage with the ResX community, the more you can earn rewards that improve your access. Submitting reservations, referring friends, and other activity can earn you tokens to redeem for perks like Front-of-the-Line Passes, giving you an even better shot at high-demand reservations when they're posted.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What do I get with ResX Premium?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX Premium gives you more access and a better chance at the reservations you want.\n\nWith Premium, you can:\n\n• See and claim reservations up to 5 days out, while Basic members can only access reservations for today and tomorrow.\n• Get priority alerts — Premium members are notified about matching reservations before Basic members.\n• Claim Premium reservations, including more in-demand restaurants and prime reservation times.\n• Set more alerts and include up to five restaurants in each Restaurant Alert, giving you more chances to find what you're looking for.\n• Earn more tokens when you submit reservations, which you can redeem for perks like Front-of-the-Line Passes.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "How do ResX Rewards work?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ResX Rewards is our in-app rewards program designed to reward our most engaged members.\n\nYou can earn tokens by contributing to the ResX community — like submitting reservations, referring friends, and leaving reviews after reservations you've claimed.\n\nYou can then use your tokens to unlock and redeem perks in the app, like Front-of-the-Line Passes and other reservation benefits.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What is Front of the Line?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Front of the Line is a perk you can unlock using your tokens. Apply it to any active alert to give that alert a boost — you'll be notified about matching reservations ahead of other users, giving you a better chance to claim them.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Is Front of the Line automatically included with Premium?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "No. Front of the Line is a redeemable Reward available to both Basic and Premium users. It is not automatically applied when you upgrade to Premium.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "I used a Token to claim a reservation and then returned it. Where is my Token?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Tokens used to claim a reservation are non-refundable, even if you return the reservation to the feed.\n\nWe recommend using your Tokens when you're confident you can make it!",
+            },
+          },
+        ],
       },
-    })),
-  ),
-};
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://resx.co/faq#breadcrumb",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://resx.co/",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "FAQ",
+            item: "https://resx.co/faq",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://resx.co/#organization",
+        name: "ResX",
+        legalName: "ResX Inc.",
+        url: "https://resx.co/",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://resx.co/_astro/logo.D8pgYnSP.svg",
+        },
+        image: "https://resx.co/og.jpg",
+        slogan: "Good things happen last minute",
+        description:
+          "ResX is a peer-to-peer reservation exchange where diners claim last-minute reservations at in-demand restaurants and submit reservations they can't make, so they avoid cancellation fees. Every reservation is shared by another ResX user. ResX does not buy or sell reservations and does not use bots.",
+        areaServed: [
+          {
+            "@type": "City",
+            name: "New York",
+            sameAs: "https://en.wikipedia.org/wiki/New_York_City",
+          },
+          {
+            "@type": "City",
+            name: "London",
+            sameAs: "https://en.wikipedia.org/wiki/London",
+          },
+        ],
+        email: "support@resx.co",
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "support@resx.co",
+        },
+        sameAs: [
+          "https://www.instagram.com/resx.nyc/",
+          "https://www.tiktok.com/@resxapp",
+          "https://www.linkedin.com/company/resxapp",
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        owns: { "@id": "https://resx.co/#app" },
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://resx.co/#website",
+        url: "https://resx.co/",
+        name: "ResX",
+        description:
+          "Claim last minute reservations. Trade in reservations you can't make.",
+        publisher: { "@id": "https://resx.co/#organization" },
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "MobileApplication",
+        "@id": "https://resx.co/#app",
+        name: "ResX",
+        alternateName: "ResX: Reservations On Demand",
+        description:
+          "A free, peer-to-peer exchange to give and take last-minute restaurant reservations at in-demand restaurants in New York and London. No resale, no bots - just diners helping diners.",
+        operatingSystem: "iOS, Android",
+        applicationCategory: "LifestyleApplication",
+        applicationSubCategory: "Food & Drink",
+        installUrl: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        sameAs: [
+          "https://apps.apple.com/us/app/resx/id6444920738",
+          "https://play.google.com/store/apps/details?id=com.resx.nyc",
+        ],
+        publisher: { "@id": "https://resx.co/#organization" },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          description:
+            "Free to download. ResX Premium is available as an in-app subscription.",
+        },
+        featureList: [
+          "Claim last-minute reservations submitted by other diners",
+          "Submit reservations you can't use and avoid cancellation fees",
+          "Restaurant Alerts and Discover Alerts for matching reservations",
+          "ResX Rewards: earn tokens and redeem perks like Front of the Line",
+          "ResX Premium: early access, more alerts, priority notifications",
+        ],
+      },
+    ],
+  },
+];
 ---
 
 <PageLayout
   title="FAQ"
   description="Answers to common questions about ResX, claiming and submitting reservations, alerts, and more."
   templated
+  jsonLd={faqJsonLd}
 >
   {/* Hero Section */}
   <section class="container pt-28 pb-3 lg:pt-36 lg:pb-5">
@@ -231,7 +555,4 @@ const faqJsonLd = {
       ))
     }
   </section>
-
-  {/* JSON-LD Schema */}
-  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
 </PageLayout>

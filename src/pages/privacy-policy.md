@@ -1,6 +1,106 @@
 ---
 layout: ../layouts/LegalLayout.astro
 title: Privacy Policy
+jsonLd:
+  - "@context": "https://schema.org"
+    "@graph":
+      - "@type": "WebPage"
+        "@id": "https://resx.co/privacy-policy#webpage"
+        url: "https://resx.co/privacy-policy"
+        name: "Privacy Policy | ResX"
+        description: "How ResX Inc. collects, uses, and protects personal information."
+        isPartOf:
+          "@id": "https://resx.co/#website"
+        publisher:
+          "@id": "https://resx.co/#organization"
+        inLanguage: "en-US"
+        primaryImageOfPage:
+          "@type": "ImageObject"
+          url: "https://resx.co/og.jpg"
+        breadcrumb:
+          "@id": "https://resx.co/privacy-policy#breadcrumb"
+        about:
+          "@id": "https://resx.co/#organization"
+        dateModified: "2025-06-17"
+      - "@type": "BreadcrumbList"
+        "@id": "https://resx.co/privacy-policy#breadcrumb"
+        itemListElement:
+          - "@type": "ListItem"
+            position: 1
+            name: "Home"
+            item: "https://resx.co/"
+          - "@type": "ListItem"
+            position: 2
+            name: "Privacy Policy"
+            item: "https://resx.co/privacy-policy"
+  - "@context": "https://schema.org"
+    "@graph":
+      - "@type": "Organization"
+        "@id": "https://resx.co/#organization"
+        name: "ResX"
+        legalName: "ResX Inc."
+        url: "https://resx.co/"
+        logo:
+          "@type": "ImageObject"
+          url: "https://resx.co/_astro/logo.D8pgYnSP.svg"
+        image: "https://resx.co/og.jpg"
+        slogan: "Good things happen last minute"
+        description: "ResX is a peer-to-peer reservation exchange where diners claim last-minute reservations at in-demand restaurants and submit reservations they can't make, so they avoid cancellation fees. Every reservation is shared by another ResX user. ResX does not buy or sell reservations and does not use bots."
+        areaServed:
+          - "@type": "City"
+            name: "New York"
+            sameAs: "https://en.wikipedia.org/wiki/New_York_City"
+          - "@type": "City"
+            name: "London"
+            sameAs: "https://en.wikipedia.org/wiki/London"
+        email: "support@resx.co"
+        contactPoint:
+          "@type": "ContactPoint"
+          contactType: "customer support"
+          email: "support@resx.co"
+        sameAs:
+          - "https://www.instagram.com/resx.nyc/"
+          - "https://www.tiktok.com/@resxapp"
+          - "https://www.linkedin.com/company/resxapp"
+          - "https://apps.apple.com/us/app/resx/id6444920738"
+          - "https://play.google.com/store/apps/details?id=com.resx.nyc"
+        owns:
+          "@id": "https://resx.co/#app"
+      - "@type": "WebSite"
+        "@id": "https://resx.co/#website"
+        url: "https://resx.co/"
+        name: "ResX"
+        description: "Claim last minute reservations. Trade in reservations you can't make."
+        publisher:
+          "@id": "https://resx.co/#organization"
+        inLanguage: "en-US"
+      - "@type": "MobileApplication"
+        "@id": "https://resx.co/#app"
+        name: "ResX"
+        alternateName: "ResX: Reservations On Demand"
+        description: "A free, peer-to-peer exchange to give and take last-minute restaurant reservations at in-demand restaurants in New York and London. No resale, no bots - just diners helping diners."
+        operatingSystem: "iOS, Android"
+        applicationCategory: "LifestyleApplication"
+        applicationSubCategory: "Food & Drink"
+        installUrl:
+          - "https://apps.apple.com/us/app/resx/id6444920738"
+          - "https://play.google.com/store/apps/details?id=com.resx.nyc"
+        sameAs:
+          - "https://apps.apple.com/us/app/resx/id6444920738"
+          - "https://play.google.com/store/apps/details?id=com.resx.nyc"
+        publisher:
+          "@id": "https://resx.co/#organization"
+        offers:
+          "@type": "Offer"
+          price: "0"
+          priceCurrency: "USD"
+          description: "Free to download. ResX Premium is available as an in-app subscription."
+        featureList:
+          - "Claim last-minute reservations submitted by other diners"
+          - "Submit reservations you can't use and avoid cancellation fees"
+          - "Restaurant Alerts and Discover Alerts for matching reservations"
+          - "ResX Rewards: earn tokens and redeem perks like Front of the Line"
+          - "ResX Premium: early access, more alerts, priority notifications"
 ---
 
 # Privacy Policy
