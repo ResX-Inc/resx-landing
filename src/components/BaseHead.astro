@@ -16,6 +16,7 @@ export interface Props {
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const GA_MEASUREMENT_ID = "G-4W53GZ7ZZR";
 
 const {
   title,
@@ -29,6 +30,20 @@ const {
 ---
 
 <meta charset="utf-8" />
+
+<script
+  is:inline
+  async
+  src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+></script>
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "G-4W53GZ7ZZR");
+</script>
 
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 
