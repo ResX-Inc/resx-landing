@@ -5,45 +5,45 @@ jsonLd:
   - "@context": "https://schema.org"
     "@graph":
       - "@type": "WebPage"
-        "@id": "https://resx.co/terms-of-use#webpage"
-        url: "https://resx.co/terms-of-use"
+        "@id": "https://www.resx.co/terms-of-use#webpage"
+        url: "https://www.resx.co/terms-of-use"
         name: "Terms of Use | ResX"
         description: "The terms governing use of the ResX website and app."
         isPartOf:
-          "@id": "https://resx.co/#website"
+          "@id": "https://www.resx.co/#website"
         publisher:
-          "@id": "https://resx.co/#organization"
+          "@id": "https://www.resx.co/#organization"
         inLanguage: "en-US"
         primaryImageOfPage:
           "@type": "ImageObject"
-          url: "https://resx.co/og.jpg"
+          url: "https://www.resx.co/og.jpg"
         breadcrumb:
-          "@id": "https://resx.co/terms-of-use#breadcrumb"
+          "@id": "https://www.resx.co/terms-of-use#breadcrumb"
         about:
-          "@id": "https://resx.co/#organization"
+          "@id": "https://www.resx.co/#organization"
         dateModified: "2025-01-13"
       - "@type": "BreadcrumbList"
-        "@id": "https://resx.co/terms-of-use#breadcrumb"
+        "@id": "https://www.resx.co/terms-of-use#breadcrumb"
         itemListElement:
           - "@type": "ListItem"
             position: 1
             name: "Home"
-            item: "https://resx.co/"
+            item: "https://www.resx.co/"
           - "@type": "ListItem"
             position: 2
             name: "Terms of Use"
-            item: "https://resx.co/terms-of-use"
+            item: "https://www.resx.co/terms-of-use"
   - "@context": "https://schema.org"
     "@graph":
       - "@type": "Organization"
-        "@id": "https://resx.co/#organization"
+        "@id": "https://www.resx.co/#organization"
         name: "ResX"
         legalName: "ResX Inc."
-        url: "https://resx.co/"
+        url: "https://www.resx.co/"
         logo:
           "@type": "ImageObject"
-          url: "https://resx.co/_astro/logo.D8pgYnSP.svg"
-        image: "https://resx.co/og.jpg"
+          url: "https://www.resx.co/_astro/logo.D8pgYnSP.svg"
+        image: "https://www.resx.co/og.jpg"
         slogan: "Good things happen last minute"
         description: "ResX is a peer-to-peer reservation exchange where diners claim last-minute reservations at in-demand restaurants and submit reservations they can't make, so they avoid cancellation fees. Every reservation is shared by another ResX user. ResX does not buy or sell reservations and does not use bots."
         areaServed:
@@ -65,17 +65,17 @@ jsonLd:
           - "https://apps.apple.com/us/app/resx/id6444920738"
           - "https://play.google.com/store/apps/details?id=com.resx.nyc"
         owns:
-          "@id": "https://resx.co/#app"
+          "@id": "https://www.resx.co/#app"
       - "@type": "WebSite"
-        "@id": "https://resx.co/#website"
-        url: "https://resx.co/"
+        "@id": "https://www.resx.co/#website"
+        url: "https://www.resx.co/"
         name: "ResX"
         description: "Claim last minute reservations. Trade in reservations you can't make."
         publisher:
-          "@id": "https://resx.co/#organization"
+          "@id": "https://www.resx.co/#organization"
         inLanguage: "en-US"
       - "@type": "MobileApplication"
-        "@id": "https://resx.co/#app"
+        "@id": "https://www.resx.co/#app"
         name: "ResX"
         alternateName: "ResX: Reservations On Demand"
         description: "A free, peer-to-peer exchange to give and take last-minute restaurant reservations at in-demand restaurants in New York and London. No resale, no bots - just diners helping diners."
@@ -89,7 +89,7 @@ jsonLd:
           - "https://apps.apple.com/us/app/resx/id6444920738"
           - "https://play.google.com/store/apps/details?id=com.resx.nyc"
         publisher:
-          "@id": "https://resx.co/#organization"
+          "@id": "https://www.resx.co/#organization"
         offers:
           "@type": "Offer"
           price: "0"

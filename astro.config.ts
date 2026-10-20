@@ -10,11 +10,11 @@ import robots from "astro-robots";
 import { FileSystemIconLoader } from "unplugin-icons/loaders";
 import icons from "unplugin-icons/vite";
 
-const ORIGIN = "resx.co";
+const ORIGIN = "www.resx.co";
 
 // https://astro.build/config
 export default defineConfig({
-  site: `https://${ORIGIN}`,
+  site: "https://www.resx.co",
   markdown: {
     remarkPlugins: [
       [
@@ -71,10 +71,10 @@ export default defineConfig({
     sitemap(),
     favicons(),
     robots({
-      host: ORIGIN,
+      host: "www.resx.co",
       sitemap: [
-        `https://${ORIGIN}/sitemap-index.xml`,
-        `https://www.${ORIGIN}/sitemap-index.xml`,
+        "https://www.resx.co/sitemap-index.xml",
+        "https://www.resx.co/sitemap-index.xml",
       ],
       policy: [
         {
