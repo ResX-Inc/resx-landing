@@ -1,24 +1,21 @@
 import { useEffect, useState } from "react";
 
+// Shape returned by GET /api/favorites/public/:userId
 interface Restaurant {
-  id: number;
   aliasId: string;
   name: string;
-  detail?: {
-    logoUrl?: string;
-    coverUrl?: string;
-  };
+  imageUrl?: string | null;
+  address?: string | null;
+  city?: {
+    id: number;
+    name: string;
+  } | null;
   rating?: {
-    rating: number;
-  };
-  location?: {
-    address?: string;
-    city?: {
-      id: number;
-      name: string;
-    };
-  };
-  cuisineTypes?: string[];
+    restaurantId?: number;
+    count?: number;
+    averageRating?: number | null;
+  } | null;
+  cuisineTypes?: string[] | null;
 }
 
 interface PublicListData {
@@ -263,60 +260,54 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
     }
   };
 
-  const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => (
-    <div className="border-b border-[#282828] p-4">
-      <div className="flex items-center gap-4">
-        <div className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
-          {restaurant.detail?.logoUrl || restaurant.detail?.coverUrl ? (
-            <img
-              src={transformImageUrl(
-                restaurant.detail.logoUrl || restaurant.detail.coverUrl,
-              )}
-              alt={restaurant.name}
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <div className="h-full w-full bg-gray-700" />
-          )}
-        </div>
+  const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
+    const imageSrc = transformImageUrl(restaurant.imageUrl ?? undefined);
+    const location = restaurant.address || restaurant.city?.name;
+    const rating = restaurant.rating?.averageRating;
+    const hasRating = typeof rating === "number" && rating > 0;
+    const cuisines = (restaurant.cuisineTypes ?? []).filter(Boolean).join(", ");
 
-        <div className="flex min-w-0 flex-1 flex-col gap-[6px]">
-          <h3 className="truncate text-base leading-4 font-[860] text-white">
-            {restaurant.name}
-          </h3>
-
-          {restaurant.location?.address && (
-            <p className="truncate text-xs leading-[18px] text-[#d1d1d1]">
-              {restaurant.location.address}
-            </p>
-          )}
-
-          <div className="flex items-start gap-1 text-xs leading-[18px] text-[#d1d1d1]">
-            {restaurant.rating?.rating && (
-              <>
-                <span>★ {restaurant.rating.rating.toFixed(1)}</span>
-                {restaurant.cuisineTypes &&
-                  restaurant.cuisineTypes.length > 0 && (
-                    <>
-                      <span>•</span>
-                      <span className="truncate">
-                        {restaurant.cuisineTypes[0]}
-                      </span>
-                    </>
-                  )}
-              </>
+    return (
+      <div className="border-b border-[#282828] p-4">
+        <div className="flex items-center gap-4">
+          <div className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
+            {imageSrc ? (
+              <img
+                src={imageSrc}
+                alt={restaurant.name}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="h-full w-full bg-gray-700" />
             )}
-            {!restaurant.rating?.rating &&
-              restaurant.cuisineTypes &&
-              restaurant.cuisineTypes.length > 0 && (
-                <span className="truncate">{restaurant.cuisineTypes[0]}</span>
-              )}
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col gap-[6px]">
+            <h3 className="truncate text-base leading-4 font-[860] text-white">
+              {restaurant.name}
+            </h3>
+
+            {location && (
+              <p className="truncate text-xs leading-[18px] text-[#d1d1d1]">
+                {location}
+              </p>
+            )}
+
+            {(hasRating || cuisines) && (
+              <div className="flex min-w-0 items-start gap-1 text-xs leading-[18px] text-[#d1d1d1]">
+                {hasRating && (
+                  <span className="flex-shrink-0">★ {rating.toFixed(1)}</span>
+                )}
+                {hasRating && cuisines && <span>•</span>}
+                {cuisines && <span className="truncate">{cuisines}</span>}
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (isMobile) {
     return (
@@ -360,7 +351,7 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
           <div className="flex flex-col">
             {data.favorites.map((restaurant) => (
               <RestaurantCard
-                key={restaurant.aliasId || restaurant.id}
+                key={restaurant.aliasId}
                 restaurant={restaurant}
               />
             ))}
@@ -396,7 +387,7 @@ export function ListViewer({ userId, cityId, apiBaseUrl }: ListViewerProps) {
           >
             {currentRestaurants.map((restaurant) => (
               <RestaurantCard
-                key={restaurant.aliasId || restaurant.id}
+                key={restaurant.aliasId}
                 restaurant={restaurant}
               />
             ))}
