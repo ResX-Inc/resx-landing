@@ -1,0 +1,264 @@
+---
+import { getImage } from "astro:assets";
+
+import bowBackdrop from "@/assets/gift/skins/bow-backdrop.png";
+import bowCopper from "@/assets/gift/skins/bow-copper.png";
+import bowRibbons from "@/assets/gift/skins/bow-ribbons.png";
+import citySkyline from "@/assets/gift/skins/city-skyline.png";
+import holidayRibbon from "@/assets/gift/skins/holiday-ribbon.png";
+import holidayWreath from "@/assets/gift/skins/holiday-wreath.png";
+import logotypeBronze from "@/assets/gift/skins/logotype-bronze.png";
+import logotypeSand from "@/assets/gift/skins/logotype-sand.png";
+import tablePasta from "@/assets/gift/skins/table-pasta.png";
+import GiftForm from "@/components/gift-cards/GiftForm.astro";
+import { OrderSummary } from "@/components/gift-cards/OrderSummary";
+import { getGiftCatalog } from "@/lib/gift/catalog";
+import { buildGiftPlans, parseDurationMonths } from "@/lib/gift/plans";
+import type { SkinAssets } from "@/lib/gift/skins";
+import PageLayout from "@/layouts/PageLayout.astro";
+
+/**
+ * The skin artwork is exported from Figma at full resolution (the city photo
+ * alone is 2731x4096). The card preview is only 366px wide, so each layer is
+ * resized here and the island receives plain URLs — React has no access to
+ * Astro's image pipeline.
+ *
+ * Widths are the layer's share of the 366px preview, doubled for retina.
+ */
+const optimize = async (src: ImageMetadata, width: number) =>
+  (await getImage({ src, width, format: "webp" })).src;
+
+const skinAssets: SkinAssets = {
+  holidayWreath: await optimize(holidayWreath, 462),
+  holidayRibbon: await optimize(holidayRibbon, 1376),
+  tablePasta: await optimize(tablePasta, 1010),
+  logotypeSand: await optimize(logotypeSand, 280),
+  bowBackdrop: await optimize(bowBackdrop, 750),
+  logotypeBronze: await optimize(logotypeBronze, 356),
+  bowCopper: await optimize(bowCopper, 396),
+  bowRibbons: await optimize(bowRibbons, 408),
+  citySkyline: await optimize(citySkyline, 732),
+};
+
+// Prices come from the catalog, never from the page.
+const catalog = await getGiftCatalog();
+const plans = catalog ? buildGiftPlans(catalog) : [];
+
+const initialDurationMonths = parseDurationMonths(
+  Astro.url.searchParams.get("plan"),
+);
+---
+
+<PageLayout
+  title="Give ResX Premium | ResX"
+  description="Add who the gift is for and when the text should arrive, then check out. A one-time gift of ResX Premium for 3, 6 or 12 months."
+>
+  {
+    /*
+    One form spans both columns so the fields, the chosen plan and the chosen
+    card design submit together, even though the summary is a separate island.
+
+    The two breakpoints order the same three blocks differently: on mobile the
+    pickers sit between the heading and the fields, while on desktop the
+    heading and fields share the left column with the summary alongside. A grid
+    with explicit placement expresses both from one DOM order — flexbox cannot,
+    because the pickers would have to interleave with a sibling's children.
+  */
+  }
+  <section class="container pt-34 pb-18">
+    {
+      /*
+      No action yet: the real flow POSTs to /api/gifts/checkout-session and
+      mounts Stripe Elements, which is blocked on the cardDesign enum. `post`
+      keeps the entered details out of the URL in the meantime.
+    */
+    }
+    <form
+      method="post"
+      class="grid grid-cols-1 items-start gap-x-16 gap-y-7 lg:grid-cols-[minmax(0,1fr)_26rem] lg:grid-rows-[auto_1fr] lg:gap-y-8"
+    >
+      <div
+        class="flex w-full flex-col items-start gap-1.5 lg:col-start-1 lg:row-start-1"
+      >
+        <h1
+          class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white lg:text-5xl lg:leading-[52px] lg:tracking-[-0.96px]"
+        >
+          Give ResX Premium
+        </h1>
+        <p
+          class="text-[15px] leading-[22px] text-white/80 lg:text-base lg:leading-6"
+        >
+          Add who it's for and when the text should arrive.<span
+            class="max-lg:hidden"
+          >
+            Checkout is next.</span
+          >
+        </p>
+      </div>
+
+      <OrderSummary
+        assets={skinAssets}
+        plans={plans}
+        initialDurationMonths={initialDurationMonths}
+        className="lg:col-start-2 lg:row-span-2 lg:row-start-1"
+        client:load
+      />
+
+      <GiftForm class="lg:col-start-1 lg:row-start-2" />
+    </form>
+  </section>
+
+  {
+    /* Clears the fixed checkout bar so the last field is never hidden behind it. */
+  }
+  <div class="h-21 lg:hidden" aria-hidden="true"></div>
+</PageLayout>
+
+<script>
+  import {
+    createGiftCheckoutSession,
+    createIdempotencyKey,
+    GiftApiError,
+  } from "@/lib/gift/api";
+  import {
+    buildCheckoutPayload,
+    GIFT_CHECKOUT_HANDOFF,
+    type GiftFormValues,
+  } from "@/lib/gift/checkout";
+
+  const form = document.querySelector<HTMLFormElement>("form");
+  const banner = document.querySelector<HTMLElement>("[data-gift-error]");
+
+  /**
+   * One key per checkout attempt, reused across retries. Regenerated only once
+   * a session has actually been created, so a user who edits the form and
+   * resubmits gets a new session rather than the stale one.
+   */
+  let idempotencyKey = createIdempotencyKey();
+  let submitting = false;
+
+  const fieldSlots = () =>
+    document.querySelectorAll<HTMLElement>("[data-error-for]");
+
+  function clearErrors() {
+    banner?.classList.add("hidden");
+    if (banner) banner.textContent = "";
+    for (const slot of fieldSlots()) {
+      slot.classList.add("hidden");
+      slot.textContent = "";
+      const field = document.getElementById(slot.dataset.errorFor ?? "");
+      field?.removeAttribute("aria-invalid");
+    }
+  }
+
+  function showBanner(message: string) {
+    if (!banner) return;
+    banner.textContent = message;
+    banner.classList.remove("hidden");
+    banner.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  /** Maps the service's request-path keys onto the inputs they belong to. */
+  const FIELD_FOR_PATH: Record<string, string> = {
+    "recipient.phone": "recipientPhone",
+    message: "message",
+    "delivery.sendAt": "sendDate",
+  };
+
+  function showFieldErrors(errors: Record<string, string>) {
+    let unmapped: string[] = [];
+    for (const [path, message] of Object.entries(errors)) {
+      const id = FIELD_FOR_PATH[path];
+      const slot = id
+        ? document.querySelector<HTMLElement>(`[data-error-for="${id}"]`)
+        : null;
+      if (!slot || !id) {
+        unmapped.push(message);
+        continue;
+      }
+      slot.textContent = message;
+      slot.classList.remove("hidden");
+      document.getElementById(id)?.setAttribute("aria-invalid", "true");
+    }
+    if (unmapped.length > 0) showBanner(unmapped.join(" "));
+    else
+      document
+        .querySelector("[data-error-for]:not(.hidden)")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function setBusy(busy: boolean) {
+    submitting = busy;
+    for (const button of form?.querySelectorAll<HTMLButtonElement>(
+      'button[type="submit"]',
+    ) ?? []) {
+      button.disabled = busy;
+      button.textContent = busy ? "Starting checkout…" : "Continue to checkout";
+    }
+  }
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (submitting || !form.reportValidity()) return;
+
+    clearErrors();
+    setBusy(true);
+
+    const data = new FormData(form);
+    const values: GiftFormValues = {
+      durationMonths: Number(data.get("durationMonths")),
+      recipientName: String(data.get("recipientName") ?? ""),
+      recipientPhone: String(data.get("recipientPhone") ?? ""),
+      message: String(data.get("message") ?? ""),
+      sendDate: String(data.get("sendDate") ?? ""),
+      sendTime: String(data.get("sendTime") ?? ""),
+      senderName: String(data.get("senderName") ?? ""),
+      senderEmail: String(data.get("senderEmail") ?? ""),
+    };
+
+    try {
+      const session = await createGiftCheckoutSession(
+        buildCheckoutPayload(values),
+        idempotencyKey,
+      );
+      // A session now exists; a later edit should create a fresh one.
+      idempotencyKey = createIdempotencyKey();
+      sessionStorage.setItem(
+        GIFT_CHECKOUT_HANDOFF,
+        JSON.stringify({
+          clientSecret: session.clientSecret,
+          checkoutSessionId: session.checkoutSessionId,
+          // Local only: the chosen artwork is not yet sent to the server, but
+          // the checkout page still shows it on the order line.
+          cardDesign: String(data.get("cardDesign") ?? ""),
+        }),
+      );
+      window.location.assign("/gift-cards/checkout");
+    } catch (error) {
+      setBusy(false);
+      if (error instanceof GiftApiError) {
+        console.error(
+          `[gift] checkout-session failed (X-Request-Id: ${error.requestId ?? "none"})`,
+        );
+        if (error.fieldErrors) {
+          showFieldErrors(error.fieldErrors);
+          return;
+        }
+        if (error.payloadErrors) {
+          // A correct form should never produce this: it is a bug in the payload.
+          showBanner(
+            "Something went wrong on our side. Please try again, and let us know if it keeps happening.",
+          );
+          return;
+        }
+        if (error.isRateLimited) {
+          showBanner(
+            "Too many attempts just now. Please wait a few minutes and try again.",
+          );
+          return;
+        }
+      }
+      showBanner("We couldn't start checkout. Please try again shortly.");
+    }
+  });
+</script>

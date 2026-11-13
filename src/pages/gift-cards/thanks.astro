@@ -1,0 +1,43 @@
+---
+import { GiftThanks } from "@/components/gift-cards/GiftThanks";
+import PageLayout from "@/layouts/PageLayout.astro";
+
+/**
+ * Stripe's return URL. The server holds this path in GIFT_CHECKOUT_RETURN_URL
+ * and appends `?session_id={CHECKOUT_SESSION_ID}`, so the route must stay at
+ * /gift-cards/thanks.
+ *
+ * The session id is not a credential — Stripe itself puts it in the return URL
+ * — so unlike the manage token it is fine in the address bar and analytics.
+ */
+const sessionId = Astro.url.searchParams.get("session_id");
+---
+
+<PageLayout
+  title="Thank you | ResX"
+  description="Your ResX Premium gift is confirmed."
+>
+  <section class="container pt-34 pb-18">
+    {
+      sessionId ? (
+        <GiftThanks sessionId={sessionId} client:load />
+      ) : (
+        <div class="bg-card/30 flex w-full max-w-150 flex-col items-start gap-4 rounded-3xl border border-white/12 p-8">
+          <h1 class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white lg:text-5xl lg:leading-[52px]">
+            Nothing to show here
+          </h1>
+          <p class="text-base leading-6 text-white/80">
+            This page confirms a gift purchase. If you've just paid, open the
+            link from your receipt email.
+          </p>
+          <a
+            href="/gift-cards"
+            class="text-sand-storm text-sm leading-5 font-semibold underline-offset-4 hover:underline"
+          >
+            Back to gift cards
+          </a>
+        </div>
+      )
+    }
+  </section>
+</PageLayout>

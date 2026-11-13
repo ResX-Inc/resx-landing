@@ -1,0 +1,49 @@
+---
+const steps = [
+  {
+    title: "Pick a plan",
+    description: "3, 6 or 12 months of Premium.",
+  },
+  {
+    title: "Add who it's for",
+    description: "Their name and phone number, plus a note if you like.",
+  },
+  {
+    title: "We text them",
+    description: "They get a link, how to open it, and who it's from.",
+  },
+];
+---
+
+<aside
+  class="bg-card/30 flex min-w-0 flex-1 flex-col items-start gap-6 rounded-3xl border border-white/12 p-8"
+>
+  <div class="flex w-full flex-col gap-1">
+    <span class="text-sm leading-5 text-zinc-300">How gifting works</span>
+    <p class="font-display text-[28px] leading-[34px] font-medium text-white">
+      Choose. Gift. Claim.
+    </p>
+  </div>
+
+  {
+    steps.map((step, index) => (
+      <div class="flex w-full items-start gap-4">
+        <span class="bg-sand-storm/10 border-sand-storm/50 text-sand-storm flex size-8 shrink-0 items-center justify-center rounded-full border text-sm leading-5 font-semibold">
+          {index + 1}
+        </span>
+        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <p class="text-base leading-6 font-semibold text-white">
+            {step.title}
+          </p>
+          <p class="text-sm leading-5 text-zinc-300/85">{step.description}</p>
+        </div>
+      </div>
+    ))
+  }
+
+  <div class="w-full border-t border-white/8 pt-4">
+    <p class="text-[13px] leading-[18px] text-zinc-300/80">
+      One-time purchase, not a subscription. The gift never expires.
+    </p>
+  </div>
+</aside>

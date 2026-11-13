@@ -11,6 +11,9 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-foreground text-background active:opacity-50 hover:bg-primary hover:-translate-y-px",
+        // The horizontal bronze call-to-action used across the gift-card pages.
+        premium:
+          "bg-premium text-white border border-white/20 shadow-[0px_8px_24px_0px_rgba(168,93,49,0.35)] hover:brightness-110 hover:-translate-y-px active:opacity-80",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
@@ -24,6 +27,7 @@ const buttonVariants = cva(
         default: "h-9 px-4 py-2",
         sm: "h-8 rounded-md px-3 text-xs",
         lg: "h-10 rounded-md px-8",
+        xl: "h-13 px-7 text-base font-semibold",
         icon: "h-9 w-9",
       },
     },

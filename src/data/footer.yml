@@ -3,6 +3,7 @@ default:
     - about
     - submit
     - claim
+    - gift-cards
     - privacy
     - terms
   socials:

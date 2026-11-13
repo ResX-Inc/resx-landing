@@ -1,0 +1,104 @@
+---
+import * as GiftCards from "@/components/gift-cards";
+import { PlanPicker } from "@/components/gift-cards/PlanPicker";
+import { getGiftCatalog } from "@/lib/gift/catalog";
+import { buildGiftPlans } from "@/lib/gift/plans";
+import * as Premium from "@/components/premium";
+import TextAccent from "@/components/TextAccent.astro";
+import {
+  Calendar,
+  ClockTimeTwo,
+  HandCoin,
+  LocalRestaurant,
+  NotificationsActive,
+  StarCircleOutline,
+} from "@/icons";
+import PageLayout from "@/layouts/PageLayout.astro";
+
+// Prices and durations are operator-editable and must never be hardcoded, so
+// they come from the catalog at request time (cached server-side).
+const catalog = await getGiftCatalog();
+const plans = catalog ? buildGiftPlans(catalog) : [];
+---
+
+<PageLayout
+  title="Gift ResX Premium | ResX"
+  description="Give first access to New York and London's hardest-to-get tables. A one-time gift of ResX Premium for 3, 6 or 12 months, delivered by text."
+>
+  {/* Hero */}
+
+  <GiftCards.Hero plans={plans} />
+
+  {/* What the gift unlocks */}
+
+  <section
+    class="bg-background rounded-t-[64px] bg-linear-to-b from-white/10 to-50% shadow-[0_-2px_0_-1px] shadow-white/20"
+  >
+    <div
+      class="container flex items-end justify-center gap-16 py-18 max-lg:flex-col max-lg:items-start"
+    >
+      <div class="flex w-full max-w-160 flex-col items-start gap-7">
+        <div class="flex w-full flex-col gap-3">
+          <h2
+            class="font-display text-5xl leading-[52px] font-normal text-white"
+          >
+            Give them even more with
+            <br />
+            <TextAccent>ResX Premium</TextAccent>
+          </h2>
+          <p class="text-lg leading-7 text-white/80">
+            In 2026, Premium members claimed 64% of the tables people wanted
+            most.
+          </p>
+        </div>
+
+        <Premium.FeatureList title="Your gift unlocks">
+          <Premium.Feature>
+            <Calendar slot="icon" />
+            <strong>Early access</strong> to all reservations
+          </Premium.Feature>
+          <Premium.Feature>
+            <NotificationsActive slot="icon" />
+            <strong>Customize</strong> your alerts
+          </Premium.Feature>
+          <Premium.Feature>
+            <LocalRestaurant slot="icon" />
+            <strong>More bookings</strong> per week
+          </Premium.Feature>
+          <Premium.Feature>
+            <HandCoin slot="icon" />
+            <strong>Earn more tokens</strong> from your submissions
+          </Premium.Feature>
+          <Premium.Feature>
+            <ClockTimeTwo slot="icon" />
+            <strong>Priority access</strong> before everyone else
+          </Premium.Feature>
+          <Premium.Feature>
+            <StarCircleOutline slot="icon" />
+            <strong>Unlimited</strong> Premium reservations
+          </Premium.Feature>
+        </Premium.FeatureList>
+      </div>
+
+      <GiftCards.HowGiftingWorks />
+    </div>
+  </section>
+
+  {/* Plans (detailed) */}
+
+  {
+    plans.length > 0 && (
+      <section class="container pt-6 pb-18">
+        <PlanPicker plans={plans} client:load />
+      </section>
+    )
+  }
+
+  {/* FAQ */}
+
+  <GiftCards.Faq />
+
+  {/* Closing */}
+
+  <GiftCards.ClosingBand />
+</PageLayout>

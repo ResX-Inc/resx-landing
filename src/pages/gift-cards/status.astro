@@ -1,0 +1,159 @@
+---
+import {
+  fetchGiftManageStatus,
+  GiftApiError,
+  type GiftManageStatus,
+} from "@/lib/gift/api";
+import { formatGiftSendAt, giftStatusCopy } from "@/lib/gift/format";
+import { GIFT_MANAGE_COOKIE } from "@/lib/gift/manageCookie";
+import PageLayout from "@/layouts/PageLayout.astro";
+
+/**
+ * The manage page. The server holds this path in GIFT_MANAGE_PAGE_URL and the
+ * receipt appends `?token=`, so the route must stay at /gift-cards/status.
+ *
+ * The token is an opaque credential and must not reach analytics. This site
+ * loads gtag in <head>, and its default page_view sends `page_location` with
+ * the full query string — so arriving with `?token=` would hand the token to
+ * Google. Instead the token is moved straight into an HttpOnly cookie and the
+ * browser is redirected to a clean URL before anything renders. As a result it
+ * never appears in the address bar, in history, in a referrer header, or in
+ * client-side JavaScript.
+ */
+const queryToken = Astro.url.searchParams.get("token");
+
+if (queryToken) {
+  Astro.cookies.set(GIFT_MANAGE_COOKIE, queryToken, {
+    httpOnly: true,
+    secure: import.meta.env.PROD,
+    sameSite: "lax",
+    // Must cover the resend endpoint as well as this page.
+    path: "/",
+    maxAge: 60 * 30,
+  });
+  return Astro.redirect("/gift-cards/status", 303);
+}
+
+const token = Astro.cookies.get(GIFT_MANAGE_COOKIE)?.value;
+const resend = Astro.url.searchParams.get("resend");
+
+let gift: GiftManageStatus | null = null;
+let unavailable = !token;
+
+if (token) {
+  try {
+    gift = await fetchGiftManageStatus(token);
+  } catch (error) {
+    // A bad, expired or unknown token is a flat 404 that reveals nothing, and
+    // the UI must not distinguish those cases.
+    if (!(error instanceof GiftApiError && error.isNotFound)) {
+      const requestId = error instanceof GiftApiError ? error.requestId : null;
+      console.error(
+        `[gift] manage lookup failed${requestId ? ` (X-Request-Id: ${requestId})` : ""}:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
+    unavailable = true;
+  }
+}
+
+const RESEND_MESSAGES: Record<string, string> = {
+  ok: "Sent. The text goes out within five minutes.",
+  conflict: "This gift can't be resent right now.",
+  limited: "You've reached the resend limit for this gift.",
+  expired: "Your session timed out. Open the link from your receipt again.",
+  error: "Something went wrong. Please try again shortly.",
+};
+const resendMessage = resend ? RESEND_MESSAGES[resend] : null;
+
+const status = gift ? giftStatusCopy(gift.status) : null;
+---
+
+<PageLayout
+  title="Your gift | ResX"
+  description="Check on a ResX Premium gift you sent."
+>
+  <section class="container pt-34 pb-18">
+    <div
+      class="bg-card/30 flex w-full max-w-150 flex-col items-start gap-5 rounded-3xl border border-white/12 p-8"
+    >
+      {
+        gift && status ? (
+          <>
+            <div class="flex w-full flex-col gap-1.5">
+              <span class="text-[13px] leading-[18px] font-medium text-zinc-300">
+                Your gift
+              </span>
+              <h1 class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white">
+                {status.label}
+              </h1>
+              {status.detail && (
+                <p class="text-base leading-6 text-white/80">{status.detail}</p>
+              )}
+            </div>
+
+            {resendMessage && (
+              <p class="border-sand-storm/40 bg-sand-storm/10 text-sand-storm w-full rounded-xl border px-4 py-3 text-sm leading-5">
+                {resendMessage}
+              </p>
+            )}
+
+            <dl class="flex w-full flex-col gap-3 border-t border-white/8 pt-5 text-[15px] leading-[22px]">
+              <div class="flex w-full items-start justify-between gap-6">
+                <dt class="shrink-0 text-zinc-300">Gift</dt>
+                <dd class="text-right text-white/90">
+                  {gift.durationMonths} months of ResX Premium
+                </dd>
+              </div>
+              <div class="flex w-full items-start justify-between gap-6">
+                <dt class="shrink-0 text-zinc-300">For</dt>
+                <dd class="text-right text-white/90">
+                  {gift.recipientName} · {gift.recipientPhoneMasked}
+                </dd>
+              </div>
+              <div class="flex w-full items-start justify-between gap-6">
+                <dt class="shrink-0 text-zinc-300">Sends</dt>
+                <dd class="text-right text-white/90">
+                  {formatGiftSendAt(gift.sendAt, gift.timeZone)} (
+                  {gift.timeZone})
+                </dd>
+              </div>
+            </dl>
+
+            {gift.canResend && (
+              <form
+                method="post"
+                action="/api/gift/resend"
+                class="w-full border-t border-white/8 pt-5"
+              >
+                <button
+                  type="submit"
+                  class="focus-visible:ring-ring h-11 cursor-pointer rounded-full border border-white/20 px-6 text-sm leading-5 font-semibold text-white transition-colors hover:border-white/40 focus-visible:ring-1 focus-visible:outline-none"
+                >
+                  Resend the text
+                </button>
+              </form>
+            )}
+          </>
+        ) : (
+          <>
+            <h1 class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white">
+              This link isn't valid
+            </h1>
+            <p class="text-base leading-6 text-white/80">
+              {unavailable && !token
+                ? "Open the link from your receipt email to see your gift."
+                : "This link has expired or doesn't match a gift. Open the most recent link from your receipt email."}
+            </p>
+            <a
+              href="/gift-cards"
+              class="text-sand-storm text-sm leading-5 font-semibold underline-offset-4 hover:underline"
+            >
+              Back to gift cards
+            </a>
+          </>
+        )
+      }
+    </div>
+  </section>
+</PageLayout>

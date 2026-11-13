@@ -1,0 +1,39 @@
+---
+import { getCollection, render } from "astro:content";
+
+const entries = await getCollection(
+  "faq",
+  (entry) => entry.data.pages?.includes("gift-cards") ?? false,
+);
+
+const questions = await Promise.all(
+  entries
+    .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+    .map(async (entry) => ({ ...entry, ...(await render(entry)) })),
+);
+---
+
+<section class="container pb-18">
+  <div class="flex items-start gap-16 max-lg:flex-col max-lg:gap-8">
+    <h2
+      class="font-display w-64 shrink-0 text-5xl leading-[52px] font-normal text-white"
+    >
+      FAQ
+    </h2>
+
+    <div class="grid min-w-0 flex-1 grid-cols-2 gap-x-8 max-md:grid-cols-1">
+      {
+        questions.map(({ data, Content }) => (
+          <div class="flex flex-col items-start gap-1.5 border-t border-white/8 py-5">
+            <p class="text-base leading-6 font-semibold text-white">
+              {data.question}
+            </p>
+            <div class="text-sm leading-[22px] text-zinc-300/85 [&_p]:m-0">
+              <Content />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

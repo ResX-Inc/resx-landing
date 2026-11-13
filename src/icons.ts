@@ -20,3 +20,11 @@ export { default as EmoticonOutline } from "~icons/mdi/emoticon-outline";
 export { default as Star } from "~icons/mdi/star";
 export { default as PartyPopper } from "~icons/mdi/party-popper";
 export { default as ArrowRight } from "~icons/mdi/arrow-right";
+export { default as ArrowLeft } from "~icons/mdi/arrow-left";
+export { default as Message } from "~icons/mdi/message";
+
+/* Gifting — exported from the Figma gifting file (src/assets/svg). */
+export { default as Crown } from "~icons/assets/gift-crown";
+export { default as GiftCheck } from "~icons/assets/gift-check";
+export { default as GiftCheckLarge } from "~icons/assets/gift-check-lg";
+export { default as GiftCheckBadge } from "~icons/assets/gift-check-sm";

@@ -119,6 +119,18 @@
     #cb9065,
     var(--color-umbra)
   );
+
+  /*
+   * The horizontal bronze used by the gift-card call-to-action. Distinct from
+   * `bronze` above: that one runs at -45deg from umbra, this one runs left to
+   * right from a lighter clay and is what the gifting designs specify.
+   */
+  --background-image-premium: linear-gradient(
+    90deg,
+    #985c3b 0%,
+    #cb9065 50%,
+    #985c3b 100%
+  );
 }
 
 @theme {

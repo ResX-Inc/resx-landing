@@ -1,0 +1,59 @@
+---
+import { Crown } from "@/icons";
+import type { GiftPlan } from "@/lib/gift/plans";
+
+import GiftCardArt from "./GiftCardArt.astro";
+import { QuickPurchase } from "./QuickPurchase";
+
+interface Props {
+  plans: GiftPlan[];
+}
+
+const { plans } = Astro.props;
+---
+
+<section class="container pt-34 pb-16">
+  <div
+    class="flex items-center justify-between gap-16 max-lg:flex-col max-lg:items-start"
+  >
+    <div class="flex w-full max-w-150 flex-col items-start gap-6">
+      <span
+        class="bg-premium flex items-center gap-1 rounded-md py-1 pr-2.5 pl-2"
+      >
+        <Crown className="size-3 text-white" />
+        <span
+          class="text-[10px] leading-[14px] font-semibold tracking-[0.8px] text-white"
+          >PREMIUM GIFT</span
+        >
+      </span>
+
+      <h1
+        class="font-display text-[50px] leading-[56px] font-normal tracking-[-2.16px] text-white max-sm:text-[36px] max-sm:leading-[42px]"
+      >
+        For the person who has everything, except a<span
+          class="font-script text-sand-storm text-[56px] leading-[56px] tracking-normal max-sm:text-[42px]"
+        >
+          West Village reservation.</span
+        >
+      </h1>
+
+      <p class="max-w-135 text-lg leading-7 text-white/80">
+        Give first access to New York and London's hardest-to-get tables, days
+        before everyone else. Pick a plan and we'll text them a link to claim
+        it.
+      </p>
+
+      {
+        plans.length > 0 ? (
+          <QuickPurchase plans={plans} client:load />
+        ) : (
+          <p class="text-sm leading-5 text-zinc-300/80">
+            Gift pricing is unavailable right now. Please try again shortly.
+          </p>
+        )
+      }
+    </div>
+
+    <GiftCardArt />
+  </div>
+</section>

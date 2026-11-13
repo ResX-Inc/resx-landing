@@ -8,9 +8,19 @@ export interface Props extends BaseLayoutProps {}
 ---
 
 <BaseLayout {...Astro.props}>
-  <main>
+  {
+    /*
+    Column layout so the footer is pushed to the bottom of the viewport on
+    short pages instead of floating in the middle. On pages taller than the
+    viewport this changes nothing. Navigation is fixed, so it sits outside the
+    flex flow.
+  */
+  }
+  <main class="flex min-h-screen flex-col">
     <Navigation />
-    <slot />
+    <div class="flex-1">
+      <slot />
+    </div>
     <Footer />
   </main>
 </BaseLayout>

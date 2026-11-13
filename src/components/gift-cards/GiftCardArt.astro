@@ -1,0 +1,87 @@
+---
+import glowCinnamon from "@/assets/gift/glow-cinnamon.svg";
+import glowSand from "@/assets/gift/glow-sand.svg";
+import { Crown, Message } from "@/icons";
+// The gift card uses the solid-white wordmark, not the site's gradient one.
+import Logo from "~icons/assets/resx-logo-white";
+
+/**
+ * The stacked gift cards and iMessage preview from the hero.
+ *
+ * The two cards are absolutely positioned and rotated exactly as in the
+ * design; this is one of the few places where fixed positioning is the only
+ * faithful translation, since the overlap and rotation are the composition.
+ */
+---
+
+<div class="relative h-110 w-114 shrink-0 max-lg:mx-auto">
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -top-10 -left-5 size-130"
+  >
+    <div class="absolute inset-[-23.08%]">
+      <img src={glowCinnamon.src} alt="" class="block size-full max-w-none" />
+    </div>
+  </div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute top-20 left-30 size-65"
+  >
+    <div class="absolute inset-[-34.62%]">
+      <img src={glowSand.src} alt="" class="block size-full max-w-none" />
+    </div>
+  </div>
+
+  {/* The card peeking out behind, rotated the other way. */}
+  <div
+    class="absolute top-[18px] left-[77px] h-[214px] w-85 rotate-9 rounded-[18px] border border-[#cb9065]/55 bg-[#242424] bg-linear-[148deg] from-white/8 to-transparent"
+  >
+  </div>
+
+  <div
+    class="absolute top-[78px] left-[38px] flex h-[214px] w-85 -rotate-7 flex-col justify-between rounded-[18px] border border-white/30 px-6 py-5.5 shadow-[0px_24px_48px_0px_rgba(0,0,0,0.5)] [background:radial-gradient(ellipse_at_center,#b87c54_17%,#925535_58.5%,#7f4126_79.25%,#6c2d16_100%)]"
+  >
+    <div class="flex w-full items-center justify-between">
+      <Logo className="h-6 w-22" />
+      <span
+        class="flex items-center gap-1 rounded-full bg-black/35 py-1 pr-2.5 pl-2"
+      >
+        <Crown className="size-3 text-white" />
+        <span
+          class="text-[10px] leading-[14px] font-semibold tracking-[0.8px] text-white"
+          >PREMIUM GIFT</span
+        >
+      </span>
+    </div>
+
+    <div class="flex w-full flex-col gap-0.5">
+      <span class="text-xs leading-4 font-medium text-white/80"
+        >ResX Premium</span
+      >
+      <span
+        class="font-display text-[34px] leading-9 font-normal tracking-[-0.68px] text-white"
+        >6 months</span
+      >
+    </div>
+  </div>
+
+  {/* The text message the recipient receives. */}
+  <div
+    class="absolute top-[338px] left-[46px] flex w-90 items-center gap-3 rounded-[18px] border border-white/14 bg-[#2b2b2b]/92 px-3.5 py-3 shadow-[0px_12px_32px_0px_rgba(0,0,0,0.45)]"
+  >
+    <span
+      class="flex size-9 shrink-0 items-center justify-center rounded-[10px] [background:radial-gradient(ellipse_at_center,#00ed54_0%,#00d93b_50%,#00c422_100%)]"
+    >
+      <Message className="size-4.5 text-white" />
+    </span>
+    <div class="flex min-w-0 flex-1 flex-col gap-px">
+      <div class="flex w-full items-center justify-between leading-4">
+        <span class="text-xs font-semibold text-white">ResX</span>
+        <span class="text-[11px] text-zinc-300/70">now</span>
+      </div>
+      <p class="text-[13px] leading-[18px] text-white/90">
+        Maya sent you 6 months of ResX Premium. Redeem now in app.
+      </p>
+    </div>
+  </div>
+</div>

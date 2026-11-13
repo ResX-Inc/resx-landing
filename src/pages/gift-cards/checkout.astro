@@ -1,0 +1,54 @@
+---
+import { getImage } from "astro:assets";
+
+import bowBackdrop from "@/assets/gift/skins/bow-backdrop.png";
+import bowCopper from "@/assets/gift/skins/bow-copper.png";
+import bowRibbons from "@/assets/gift/skins/bow-ribbons.png";
+import citySkyline from "@/assets/gift/skins/city-skyline.png";
+import holidayRibbon from "@/assets/gift/skins/holiday-ribbon.png";
+import holidayWreath from "@/assets/gift/skins/holiday-wreath.png";
+import logotypeBronze from "@/assets/gift/skins/logotype-bronze.png";
+import logotypeSand from "@/assets/gift/skins/logotype-sand.png";
+import tablePasta from "@/assets/gift/skins/table-pasta.png";
+import { GiftCheckout } from "@/components/gift-cards/GiftCheckout";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { SkinAssets } from "@/lib/gift/skins";
+
+/**
+ * Checkout runs on BaseLayout rather than PageLayout: the design is a full
+ * two-panel payment screen with no site navigation or footer, which also keeps
+ * the buyer from wandering off mid-payment.
+ *
+ * The island is client:only because it reads the client secret from
+ * sessionStorage and mounts Stripe.js — neither of which can run on the server.
+ */
+const optimize = async (src: ImageMetadata, width: number) =>
+  (await getImage({ src, width, format: "webp" })).src;
+
+const skinAssets: SkinAssets = {
+  holidayWreath: await optimize(holidayWreath, 200),
+  holidayRibbon: await optimize(holidayRibbon, 260),
+  tablePasta: await optimize(tablePasta, 200),
+  logotypeSand: await optimize(logotypeSand, 120),
+  bowBackdrop: await optimize(bowBackdrop, 160),
+  logotypeBronze: await optimize(logotypeBronze, 120),
+  bowCopper: await optimize(bowCopper, 120),
+  bowRibbons: await optimize(bowRibbons, 120),
+  citySkyline: await optimize(citySkyline, 160),
+};
+
+const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
+---
+
+<BaseLayout
+  title="Checkout | ResX"
+  description="Complete your ResX Premium gift purchase."
+>
+  <main class="bg-background min-h-screen">
+    <GiftCheckout
+      publishableKey={publishableKey}
+      assets={skinAssets}
+      client:only="react"
+    />
+  </main>
+</BaseLayout>

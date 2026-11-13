@@ -3,6 +3,7 @@ default:
     - about
     - submit
     - claim
+    - gift-cards
     - faq
     - merch
   cta: download

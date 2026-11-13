@@ -1,0 +1,23 @@
+---
+import { buttonVariants } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
+---
+
+<section class="container">
+  <div
+    class="flex items-center justify-between gap-8 rounded-[32px] border border-white/12 bg-[rgba(64,64,64,0.3)] bg-linear-[171deg] from-[rgba(168,93,49,0.35)] to-transparent to-60% px-12 py-10 max-md:flex-col max-md:items-start"
+  >
+    <p
+      class="font-display text-[40px] leading-[44px] font-normal tracking-[-0.8px] text-white max-sm:text-3xl max-sm:leading-tight"
+    >
+      Last-minute gift,<br />first-in-line access.
+    </p>
+
+    <a
+      href="/gift-cards/buy"
+      class={cn(buttonVariants({ variant: "premium", size: "xl" }))}
+    >
+      Gift Premium
+    </a>
+  </div>
+</section>

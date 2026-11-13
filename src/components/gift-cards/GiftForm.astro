@@ -1,0 +1,162 @@
+---
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/Textarea";
+import { cn } from "@/lib/utils";
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {}
+
+const { class: className, ...rest } = Astro.props;
+
+/**
+ * The left column of /gift-cards/buy. Every field is uncontrolled, so this
+ * renders as plain HTML with no island — the primitives are React components
+ * but Astro renders them on the server without hydrating.
+ */
+---
+
+<div
+  {...rest}
+  class={cn("flex w-full flex-col items-start gap-7 lg:gap-8", className)}
+>
+  <p
+    data-gift-error
+    class="border-destructive/50 bg-destructive/10 text-destructive hidden w-full rounded-xl border px-4 py-3 text-sm leading-5"
+    role="alert"
+  >
+  </p>
+
+  <section class="flex w-full flex-col items-start gap-3.5">
+    <h2 class="font-display text-[22px] leading-7 font-medium text-white">
+      Who it's for
+    </h2>
+
+    <div class="flex w-full items-start gap-4 max-lg:flex-col max-lg:gap-3">
+      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+        <Label htmlFor="recipientName">Their name</Label>
+        <Input
+          id="recipientName"
+          name="recipientName"
+          autoComplete="name"
+          required
+          placeholder="Alex Moreau"
+        />
+      </div>
+      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+        <Label htmlFor="recipientPhone">Their phone number</Label>
+        <Input
+          id="recipientPhone"
+          name="recipientPhone"
+          type="tel"
+          autoComplete="tel"
+          required
+          placeholder="+1 (234) 567-8900"
+        />
+      </div>
+      <p
+        data-error-for="recipientPhone"
+        class="text-destructive hidden text-[13px] leading-[18px]"
+        role="alert"
+      >
+      </p>
+    </div>
+
+    <p class="w-full text-[13px] leading-[18px] text-zinc-300/80">
+      We text the gift here. It locks to the ResX account with this number.
+    </p>
+
+    <div class="flex w-full flex-col gap-1.5">
+      <Label htmlFor="message">Your message (optional)</Label>
+      <Textarea
+        id="message"
+        name="message"
+        maxLength={300}
+        placeholder="Happy holidays, here's to a year of great meals"
+      />
+    </div>
+    <p
+      data-error-for="message"
+      class="text-destructive hidden text-[13px] leading-[18px]"
+      role="alert"
+    >
+    </p>
+  </section>
+
+  <section class="flex w-full flex-col items-start gap-3.5">
+    <h2 class="font-display text-[22px] leading-7 font-medium text-white">
+      Schedule your gift
+    </h2>
+
+    <div class="flex w-full items-start gap-4 max-lg:gap-3">
+      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+        <Label htmlFor="sendDate">Date</Label>
+        <Input id="sendDate" name="sendDate" type="date" />
+      </div>
+      <p
+        data-error-for="sendDate"
+        class="text-destructive hidden text-[13px] leading-[18px]"
+        role="alert"
+      >
+      </p>
+      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+        <Label htmlFor="sendTime">Time</Label>
+        <Input id="sendTime" name="sendTime" type="time" />
+      </div>
+    </div>
+
+    <p class="w-full text-[13px] leading-[18px] text-zinc-300/80">
+      Their local time, any time up to 12 months out.
+    </p>
+  </section>
+
+  <section class="flex w-full flex-col items-start gap-3.5">
+    <h2 class="font-display text-[22px] leading-7 font-medium text-white">
+      From
+    </h2>
+
+    <div class="flex w-full items-start gap-4 max-lg:flex-col max-lg:gap-3">
+      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+        <Label htmlFor="senderName">Your name</Label>
+        <Input
+          id="senderName"
+          name="senderName"
+          autoComplete="name"
+          required
+          placeholder="Alex Moreau"
+        />
+      </div>
+      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+        <Label htmlFor="senderEmail">Email for your receipt</Label>
+        <Input
+          id="senderEmail"
+          name="senderEmail"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="hello@you.com"
+        />
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  /*
+   * Default the schedule to now. This runs on the client on purpose: the
+   * server's clock and timezone are not the sender's, and the field is
+   * labelled as the recipient's local time.
+   */
+  const pad = (value: number) => String(value).padStart(2, "0");
+  const now = new Date();
+
+  const date = document.getElementById("sendDate") as HTMLInputElement | null;
+  const time = document.getElementById("sendTime") as HTMLInputElement | null;
+
+  if (date && !date.value) {
+    date.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  }
+  if (time && !time.value) {
+    time.value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  }
+</script>
