@@ -2,7 +2,12 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { GiftCheck, GiftCheckBadge } from "@/icons";
-import { defaultGiftPlan, findGiftPlan, type GiftPlan } from "@/lib/gift/plans";
+import {
+  defaultGiftPlan,
+  findGiftPlan,
+  giftBadgeLabel,
+  type GiftPlan,
+} from "@/lib/gift/plans";
 import {
   DEFAULT_SKIN_ID,
   GIFT_SKINS,
@@ -34,7 +39,20 @@ interface CompactPlanTileProps {
   onSelect: () => void;
 }
 
+/**
+ * Same hierarchy as the landing page's plan tiles: the duration leads, the
+ * monthly rate is bold (it carries the saving), and the total is supporting
+ * text.
+ *
+ * Below lg each tile is a full-width row with a radio, like the landing page.
+ * On desktop the three tiles share a narrow summary card (~116px each), which
+ * has no room for a radio beside "12 months" or for the full "Best value ·
+ * 21% off" badge — so selection is shown the way the card-design thumbnails
+ * show it (border plus a corner check), and the badge shortens to the saving.
+ */
 function CompactPlanTile({ plan, selected, onSelect }: CompactPlanTileProps) {
+  const badge = giftBadgeLabel(plan);
+  const shortBadge = plan.savings ? `${plan.savings.percent}% off` : plan.badge;
   return (
     <button
       type="button"
@@ -42,44 +60,49 @@ function CompactPlanTile({ plan, selected, onSelect }: CompactPlanTileProps) {
       aria-checked={selected}
       onClick={onSelect}
       className={cn(
-        "relative flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 rounded-[14px] p-3 text-left transition-colors",
+        "relative flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[14px] px-3.5 py-3 text-left transition-colors lg:flex-col lg:items-start lg:gap-1.5 lg:p-3",
         "focus-visible:ring-ring focus-visible:ring-1 focus-visible:outline-none",
         selected
           ? "bg-sand-storm/10 border-sand-storm border-[1.5px]"
           : "bg-card/30 border border-white/12 hover:border-white/25",
       )}
     >
-      {plan.badge && (
-        <span className="bg-sand-storm absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] leading-[14px] font-semibold text-black">
-          {plan.badge}
+      {badge && (
+        <span className="bg-sand-storm absolute -top-2.5 left-3.5 rounded-full px-2 py-0.5 text-[10px] leading-[14px] font-semibold whitespace-nowrap text-black lg:left-3">
+          <span className="lg:hidden">{badge}</span>
+          <span className="max-lg:hidden">{shortBadge}</span>
         </span>
       )}
 
-      <span className="flex w-full items-center justify-between">
-        <span
-          className={cn(
-            "text-xs leading-[18px] font-semibold",
-            selected ? "text-sand-storm" : "text-white",
-          )}
-        >
-          {plan.name}
-        </span>
-        <span
-          aria-hidden="true"
-          className={cn(
-            "flex size-[18px] shrink-0 items-center justify-center rounded-full",
-            selected ? "bg-sand-storm text-black" : "border-sand-storm border",
-          )}
-        >
-          {selected && <GiftCheck className="size-3" />}
-        </span>
+      {/* Radio on mobile rows; on desktop, a check only when selected. */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "flex size-[18px] shrink-0 items-center justify-center rounded-full lg:absolute lg:top-1.5 lg:right-1.5 lg:size-[14px]",
+          selected
+            ? "bg-sand-storm text-black"
+            : "border-sand-storm border lg:hidden",
+        )}
+      >
+        {selected && <GiftCheck className="size-3 lg:size-2.5" />}
       </span>
 
-      <span className="font-display text-xl leading-[30px] font-medium text-white">
-        {plan.price}
+      <span
+        className={cn(
+          "font-display min-w-0 flex-1 text-2xl leading-[30px] font-medium whitespace-nowrap lg:flex-none lg:text-lg lg:leading-6",
+          selected ? "text-sand-storm" : "text-white",
+        )}
+      >
+        {plan.name}
       </span>
-      <span className="text-xs leading-4 text-zinc-300/80">
-        {plan.perMonthShort}
+
+      <span className="flex shrink-0 flex-col items-end gap-px lg:items-start">
+        <span className="text-base leading-6 font-semibold text-white lg:text-[15px] lg:leading-5">
+          {plan.perMonthShort}
+        </span>
+        <span className="text-xs leading-4 text-zinc-300/80">
+          {plan.price} total
+        </span>
       </span>
     </button>
   );
@@ -191,7 +214,7 @@ export function OrderSummary({
         <div
           role="radiogroup"
           aria-labelledby="gift-plan-label"
-          className="flex w-full items-start gap-2"
+          className="flex w-full items-stretch gap-3 max-lg:flex-col lg:gap-2"
         >
           {plans.map((candidate) => (
             <CompactPlanTile

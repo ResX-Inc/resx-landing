@@ -116,14 +116,18 @@ export const GIFT_SKINS = [
   {
     id: "bow",
     name: "Bow",
-    background: "#ffffff",
+    // Black, not white: the artwork is a dark card, so any sub-pixel gap at an
+    // edge disappears instead of showing as a white line.
+    background: "#000000",
     layers: [
       {
         asset: "bowBackdrop",
         left: -2.46,
         top: -3.07,
         width: 102.57,
-        height: 101.0,
+        // 101 stopped ~2% short of the bottom edge; overhang top and bottom
+        // equally. The backdrop is a plain gradient, so the extra crop is safe.
+        height: 106.14,
       },
       {
         asset: "logotypeBronze",
@@ -142,7 +146,9 @@ export const GIFT_SKINS = [
       {
         asset: "bowRibbons",
         left: 69.68,
-        top: 47.95,
+        // Was 47.95, which ended the ribbon ~1.5% above the bottom edge; moved
+        // down so it runs off the card like the top-left ribbon does.
+        top: 49.95,
         width: 30.43,
         height: 50.5,
         crop: { left: -82.79, top: -28.6, width: 182.89, height: 128.6 },
@@ -158,7 +164,8 @@ export const GIFT_SKINS = [
         asset: "citySkyline",
         left: -1.18,
         top: -118.3,
-        width: 100,
+        // 100 left a white sliver on the right edge; overhang both sides equally.
+        width: 102.36,
         height: 262.5,
         overlay: "rgba(0,0,0,0.39)",
       },

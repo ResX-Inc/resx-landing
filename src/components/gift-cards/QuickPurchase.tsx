@@ -3,6 +3,7 @@ import { GiftCheck } from "@/icons";
 import {
   defaultGiftPlan,
   findGiftPlan,
+  giftBadgeLabel,
   giftCtaLabel,
   type GiftPlan,
 } from "@/lib/gift/plans";
@@ -15,7 +16,16 @@ interface PlanTileProps {
   onSelect: () => void;
 }
 
+/**
+ * Leads with what they're getting (the duration), then the monthly rate in
+ * bold — the number that falls as the plan gets longer, so it carries the
+ * savings — with the one-time total as supporting text.
+ *
+ * Desktop tiles are columns; on phones each tile is a full-width row (duration
+ * left, pricing right), since three columns at that width wrap "12 months".
+ */
 function PlanTile({ plan, selected, onSelect }: PlanTileProps) {
+  const badge = giftBadgeLabel(plan);
   return (
     <button
       type="button"
@@ -23,44 +33,45 @@ function PlanTile({ plan, selected, onSelect }: PlanTileProps) {
       aria-checked={selected}
       onClick={onSelect}
       className={cn(
-        "relative flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 rounded-[14px] px-3.5 py-3 text-left transition-colors",
+        "relative flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[14px] px-3.5 py-3 text-left transition-colors sm:flex-col sm:items-start sm:gap-2",
         "focus-visible:ring-ring focus-visible:ring-1 focus-visible:outline-none",
         selected
           ? "bg-sand-storm/10 border-sand-storm border-[1.5px]"
           : "bg-card/30 border border-white/12 hover:border-white/25",
       )}
     >
-      {plan.badge && (
+      {badge && (
         <span className="bg-sand-storm absolute -top-2.5 left-3.5 rounded-full px-2 py-0.5 text-[10px] leading-[14px] font-semibold text-black">
-          {plan.badge}
+          {badge}
         </span>
       )}
 
-      <span className="flex w-full items-center justify-between">
-        <span
-          className={cn(
-            "text-[13px] leading-[18px] font-semibold",
-            selected ? "text-sand-storm" : "text-white",
-          )}
-        >
-          {plan.name}
-        </span>
-        <span
-          aria-hidden="true"
-          className={cn(
-            "flex size-[18px] shrink-0 items-center justify-center rounded-full",
-            selected ? "bg-sand-storm text-black" : "border-sand-storm border",
-          )}
-        >
-          {selected && <GiftCheck className="size-3" />}
-        </span>
+      <span
+        aria-hidden="true"
+        className={cn(
+          "flex size-[18px] shrink-0 items-center justify-center rounded-full sm:absolute sm:top-3.5 sm:right-3.5",
+          selected ? "bg-sand-storm text-black" : "border-sand-storm border",
+        )}
+      >
+        {selected && <GiftCheck className="size-3" />}
       </span>
 
-      <span className="font-display text-2xl leading-[30px] font-medium text-white">
-        {plan.price}
+      <span
+        className={cn(
+          "font-display min-w-0 flex-1 text-2xl leading-[30px] font-medium whitespace-nowrap sm:pr-6",
+          selected ? "text-sand-storm" : "text-white",
+        )}
+      >
+        {plan.name}
       </span>
-      <span className="text-[12px] leading-4 text-zinc-300/80">
-        {plan.tagline}
+
+      <span className="flex shrink-0 flex-col items-end gap-px sm:items-start">
+        <span className="text-base leading-6 font-semibold text-white">
+          {plan.perMonthShort}
+        </span>
+        <span className="text-[12px] leading-4 text-zinc-300/80">
+          {plan.price} total
+        </span>
       </span>
     </button>
   );
@@ -88,7 +99,7 @@ export function QuickPurchase({ plans }: { plans: GiftPlan[] }) {
       <div
         role="radiogroup"
         aria-labelledby="gift-quick-purchase-label"
-        className="flex w-full items-stretch gap-3"
+        className="flex w-full items-stretch gap-3 max-sm:flex-col"
       >
         {plans.map((candidate) => (
           <PlanTile

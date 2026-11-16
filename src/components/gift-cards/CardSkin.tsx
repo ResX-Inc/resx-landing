@@ -17,8 +17,14 @@ interface CardSkinProps {
 export function CardSkin({ skin, assets, className, label }: CardSkinProps) {
   return (
     <div
-      className={cn("@container relative overflow-hidden", className)}
-      style={{ background: skin.background }}
+      // bg-clip-padding keeps the skin colour (often white) from showing through
+      // a translucent border. backgroundColor rather than the `background`
+      // shorthand, which would reset the clip back to border-box.
+      className={cn(
+        "@container relative overflow-hidden bg-clip-padding",
+        className,
+      )}
+      style={{ backgroundColor: skin.background }}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}

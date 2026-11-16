@@ -13,13 +13,21 @@ const { class: className, ...rest } = Astro.props;
  * The left column of /gift-cards/buy. Every field is uncontrolled, so this
  * renders as plain HTML with no island — the primitives are React components
  * but Astro renders them on the server without hydrating.
+ *
+ * Layout: three numbered steps separated by hairlines, each with a two-column
+ * field grid from `sm` up. Helper and error text sit directly under the field
+ * they describe. The page script finds error slots by `data-error-for`, not by
+ * position, so they can live inside each field's column.
  */
+
+const sectionClass =
+  "flex w-full flex-col items-start gap-4 border-t border-white/8 pt-7 first-of-type:border-t-0 first-of-type:pt-0";
+const fieldClass = "flex min-w-0 flex-col gap-1.5";
+const hintClass = "text-xs leading-4 text-zinc-300/70";
+const errorClass = "text-destructive hidden text-xs leading-4";
 ---
 
-<div
-  {...rest}
-  class={cn("flex w-full flex-col items-start gap-7 lg:gap-8", className)}
->
+<div {...rest} class={cn("flex w-full flex-col items-start gap-7", className)}>
   <p
     data-gift-error
     class="border-destructive/50 bg-destructive/10 text-destructive hidden w-full rounded-xl border px-4 py-3 text-sm leading-5"
@@ -27,13 +35,20 @@ const { class: className, ...rest } = Astro.props;
   >
   </p>
 
-  <section class="flex w-full flex-col items-start gap-3.5">
-    <h2 class="font-display text-[22px] leading-7 font-medium text-white">
+  <section class={sectionClass}>
+    <h2
+      class="font-display flex items-center gap-2.5 text-lg leading-6 font-medium text-white"
+    >
+      <span
+        aria-hidden="true"
+        class="border-sand-storm/50 text-sand-storm flex size-6 items-center justify-center rounded-full border font-sans text-xs font-semibold"
+        >1</span
+      >
       Who it's for
     </h2>
 
-    <div class="flex w-full items-start gap-4 max-lg:flex-col max-lg:gap-3">
-      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+    <div class="grid w-full grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
+      <div class={fieldClass}>
         <Label htmlFor="recipientName">Their name</Label>
         <Input
           id="recipientName"
@@ -43,7 +58,7 @@ const { class: className, ...rest } = Astro.props;
           placeholder="Alex Moreau"
         />
       </div>
-      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+      <div class={fieldClass}>
         <Label htmlFor="recipientPhone">Their phone number</Label>
         <Input
           id="recipientPhone"
@@ -53,80 +68,80 @@ const { class: className, ...rest } = Astro.props;
           required
           placeholder="+1 (234) 567-8900"
         />
+        <p class={hintClass}>
+          We text the gift here. It locks to the ResX account with this number.
+        </p>
+        <p data-error-for="recipientPhone" class={errorClass} role="alert"></p>
       </div>
-      <p
-        data-error-for="recipientPhone"
-        class="text-destructive hidden text-[13px] leading-[18px]"
-        role="alert"
-      >
-      </p>
-    </div>
 
-    <p class="w-full text-[13px] leading-[18px] text-zinc-300/80">
-      We text the gift here. It locks to the ResX account with this number.
-    </p>
-
-    <div class="flex w-full flex-col gap-1.5">
-      <Label htmlFor="message">Your message (optional)</Label>
-      <Textarea
-        id="message"
-        name="message"
-        maxLength={300}
-        placeholder="Happy holidays, here's to a year of great meals"
-      />
+      <div class={cn(fieldClass, "sm:col-span-2")}>
+        <div class="flex items-baseline justify-between gap-3">
+          <Label htmlFor="message">Your message</Label>
+          <span class={hintClass}>Optional</span>
+        </div>
+        <Textarea
+          id="message"
+          name="message"
+          maxLength={300}
+          placeholder="Happy holidays, here's to a year of great meals"
+        />
+        <p data-error-for="message" class={errorClass} role="alert"></p>
+      </div>
     </div>
-    <p
-      data-error-for="message"
-      class="text-destructive hidden text-[13px] leading-[18px]"
-      role="alert"
-    >
-    </p>
   </section>
 
-  <section class="flex w-full flex-col items-start gap-3.5">
-    <h2 class="font-display text-[22px] leading-7 font-medium text-white">
+  <section class={sectionClass}>
+    <h2
+      class="font-display flex items-center gap-2.5 text-lg leading-6 font-medium text-white"
+    >
+      <span
+        aria-hidden="true"
+        class="border-sand-storm/50 text-sand-storm flex size-6 items-center justify-center rounded-full border font-sans text-xs font-semibold"
+        >2</span
+      >
       Schedule your gift
     </h2>
 
-    <div class="flex w-full items-start gap-4 max-lg:gap-3">
-      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+    <div class="grid w-full grid-cols-2 gap-x-3 gap-y-1.5">
+      <div class={fieldClass}>
         <Label htmlFor="sendDate">Date</Label>
         <Input id="sendDate" name="sendDate" type="date" />
+        <p data-error-for="sendDate" class={errorClass} role="alert"></p>
       </div>
-      <p
-        data-error-for="sendDate"
-        class="text-destructive hidden text-[13px] leading-[18px]"
-        role="alert"
-      >
-      </p>
-      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+      <div class={fieldClass}>
         <Label htmlFor="sendTime">Time</Label>
         <Input id="sendTime" name="sendTime" type="time" />
       </div>
+      <p class={cn(hintClass, "col-span-2")}>
+        Their local time, any time up to 12 months out.
+      </p>
     </div>
-
-    <p class="w-full text-[13px] leading-[18px] text-zinc-300/80">
-      Their local time, any time up to 12 months out.
-    </p>
   </section>
 
-  <section class="flex w-full flex-col items-start gap-3.5">
-    <h2 class="font-display text-[22px] leading-7 font-medium text-white">
+  <section class={sectionClass}>
+    <h2
+      class="font-display flex items-center gap-2.5 text-lg leading-6 font-medium text-white"
+    >
+      <span
+        aria-hidden="true"
+        class="border-sand-storm/50 text-sand-storm flex size-6 items-center justify-center rounded-full border font-sans text-xs font-semibold"
+        >3</span
+      >
       From
     </h2>
 
-    <div class="flex w-full items-start gap-4 max-lg:flex-col max-lg:gap-3">
-      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+    <div class="grid w-full grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
+      <div class={fieldClass}>
         <Label htmlFor="senderName">Your name</Label>
         <Input
           id="senderName"
           name="senderName"
           autoComplete="name"
           required
-          placeholder="Alex Moreau"
+          placeholder="Jordan Lee"
         />
       </div>
-      <div class="flex min-w-0 flex-1 flex-col gap-1.5 max-lg:w-full">
+      <div class={fieldClass}>
         <Label htmlFor="senderEmail">Email for your receipt</Label>
         <Input
           id="senderEmail"

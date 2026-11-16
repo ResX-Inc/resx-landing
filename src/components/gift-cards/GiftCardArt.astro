@@ -1,9 +1,22 @@
 ---
+import { getImage } from "astro:assets";
+
 import glowCinnamon from "@/assets/gift/glow-cinnamon.svg";
 import glowSand from "@/assets/gift/glow-sand.svg";
-import { Crown, Message } from "@/icons";
-// The gift card uses the solid-white wordmark, not the site's gradient one.
-import Logo from "~icons/assets/resx-logo-white";
+import bowBackdrop from "@/assets/gift/skins/bow-backdrop.png";
+import bowCopper from "@/assets/gift/skins/bow-copper.png";
+import bowRibbons from "@/assets/gift/skins/bow-ribbons.png";
+import citySkyline from "@/assets/gift/skins/city-skyline.png";
+import holidayRibbon from "@/assets/gift/skins/holiday-ribbon.png";
+import holidayWreath from "@/assets/gift/skins/holiday-wreath.png";
+import logotypeBronze from "@/assets/gift/skins/logotype-bronze.png";
+import logotypeSand from "@/assets/gift/skins/logotype-sand.png";
+import tablePasta from "@/assets/gift/skins/table-pasta.png";
+import { GIFT_SKINS, type SkinAssets } from "@/lib/gift/skins";
+// An iMessage-style oval bubble (our own drawing, not Apple's icon artwork).
+import MessageBubble from "~icons/assets/message-bubble";
+
+import { CardSkin } from "./CardSkin";
 
 /**
  * The stacked gift cards and iMessage preview from the hero.
@@ -11,7 +24,30 @@ import Logo from "~icons/assets/resx-logo-white";
  * The two cards are absolutely positioned and rotated exactly as in the
  * design; this is one of the few places where fixed positioning is the only
  * faithful translation, since the overlap and rotation are the composition.
+ *
+ * Both cards are real skins from /gift-cards/buy, rendered by the same
+ * CardSkin, so the hero shows designs a buyer can actually pick. The cards are
+ * 340px wide here, close to the buy page's 366px preview, so the same retina
+ * widths are reused.
  */
+const optimize = async (src: ImageMetadata, width: number) =>
+  (await getImage({ src, width, format: "webp" })).src;
+
+const skinAssets: SkinAssets = {
+  holidayWreath: await optimize(holidayWreath, 462),
+  holidayRibbon: await optimize(holidayRibbon, 1376),
+  tablePasta: await optimize(tablePasta, 1010),
+  logotypeSand: await optimize(logotypeSand, 280),
+  bowBackdrop: await optimize(bowBackdrop, 750),
+  logotypeBronze: await optimize(logotypeBronze, 356),
+  bowCopper: await optimize(bowCopper, 396),
+  bowRibbons: await optimize(bowRibbons, 408),
+  citySkyline: await optimize(citySkyline, 732),
+};
+
+const skinById = (id: string) => GIFT_SKINS.find((skin) => skin.id === id)!;
+const frontSkin = skinById("holiday");
+const backSkin = skinById("city");
 ---
 
 <div class="relative h-110 w-114 shrink-0 max-lg:mx-auto">
@@ -33,46 +69,27 @@ import Logo from "~icons/assets/resx-logo-white";
   </div>
 
   {/* The card peeking out behind, rotated the other way. */}
-  <div
-    class="absolute top-[18px] left-[77px] h-[214px] w-85 rotate-9 rounded-[18px] border border-[#cb9065]/55 bg-[#242424] bg-linear-[148deg] from-white/8 to-transparent"
-  >
-  </div>
+  <CardSkin
+    skin={backSkin}
+    assets={skinAssets}
+    className="absolute top-[18px] left-[77px] aspect-[366/209] w-85 rotate-9 rounded-[18px] border border-[#cb9065]/55"
+  />
 
-  <div
-    class="absolute top-[78px] left-[38px] flex h-[214px] w-85 -rotate-7 flex-col justify-between rounded-[18px] border border-white/30 px-6 py-5.5 shadow-[0px_24px_48px_0px_rgba(0,0,0,0.5)] [background:radial-gradient(ellipse_at_center,#b87c54_17%,#925535_58.5%,#7f4126_79.25%,#6c2d16_100%)]"
-  >
-    <div class="flex w-full items-center justify-between">
-      <Logo className="h-6 w-22" />
-      <span
-        class="flex items-center gap-1 rounded-full bg-black/35 py-1 pr-2.5 pl-2"
-      >
-        <Crown className="size-3 text-white" />
-        <span
-          class="text-[10px] leading-[14px] font-semibold tracking-[0.8px] text-white"
-          >PREMIUM GIFT</span
-        >
-      </span>
-    </div>
-
-    <div class="flex w-full flex-col gap-0.5">
-      <span class="text-xs leading-4 font-medium text-white/80"
-        >ResX Premium</span
-      >
-      <span
-        class="font-display text-[34px] leading-9 font-normal tracking-[-0.68px] text-white"
-        >6 months</span
-      >
-    </div>
-  </div>
+  <CardSkin
+    skin={frontSkin}
+    assets={skinAssets}
+    label={`${frontSkin.name} gift card design`}
+    className="absolute top-[78px] left-[38px] aspect-[366/209] w-85 -rotate-7 rounded-[18px] border border-white/30 shadow-[0px_24px_48px_0px_rgba(0,0,0,0.5)]"
+  />
 
   {/* The text message the recipient receives. */}
   <div
     class="absolute top-[338px] left-[46px] flex w-90 items-center gap-3 rounded-[18px] border border-white/14 bg-[#2b2b2b]/92 px-3.5 py-3 shadow-[0px_12px_32px_0px_rgba(0,0,0,0.45)]"
   >
     <span
-      class="flex size-9 shrink-0 items-center justify-center rounded-[10px] [background:radial-gradient(ellipse_at_center,#00ed54_0%,#00d93b_50%,#00c422_100%)]"
+      class="flex size-9 shrink-0 items-center justify-center rounded-[10px] [background:linear-gradient(180deg,#5df777_0%,#0bc02f_100%)]"
     >
-      <Message className="size-4.5 text-white" />
+      <MessageBubble className="size-6 text-white" />
     </span>
     <div class="flex min-w-0 flex-1 flex-col gap-px">
       <div class="flex w-full items-center justify-between leading-4">

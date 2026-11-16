@@ -13,29 +13,13 @@ export interface GiftPlanCopy {
   durationMonths: GiftDurationMonths;
   /** Sentence-case duration, e.g. "6 months". */
   name: string;
-  tagline: string;
   badge: string | null;
 }
 
 export const GIFT_PLAN_COPY: Record<GiftDurationMonths, GiftPlanCopy> = {
-  3: {
-    durationMonths: 3,
-    name: "3 months",
-    tagline: "A taste of first access.",
-    badge: null,
-  },
-  6: {
-    durationMonths: 6,
-    name: "6 months",
-    tagline: "Through spring, sorted.",
-    badge: null,
-  },
-  12: {
-    durationMonths: 12,
-    name: "12 months",
-    tagline: "A year of the city's best.",
-    badge: "Best value",
-  },
+  3: { durationMonths: 3, name: "3 months", badge: null },
+  6: { durationMonths: 6, name: "6 months", badge: null },
+  12: { durationMonths: 12, name: "12 months", badge: "Best value" },
 };
 
 export interface GiftPlan extends GiftPlanCopy {
@@ -46,7 +30,16 @@ export interface GiftPlan extends GiftPlanCopy {
   price: string;
   perMonth: string;
   perMonthShort: string;
+  /**
+   * Monthly saving against the shortest plan, e.g. `{ percent: 21, versus:
+   * "3 months" }`. Null for the baseline itself and for any saving under
+   * MIN_SAVINGS_PERCENT, so a small or stale discount is never advertised.
+   */
+  savings: { percent: number; versus: string } | null;
 }
+
+/** Below this, a "Save N%" claim reads as stingy rather than persuasive. */
+const MIN_SAVINGS_PERCENT = 10;
 
 export function formatMoney(minorUnits: number, currency: string): string {
   try {
@@ -62,29 +55,44 @@ export function formatMoney(minorUnits: number, currency: string): string {
 
 /** Joins catalog pricing to local copy, dropping durations we have no copy for. */
 export function buildGiftPlans(catalog: GiftCatalog): GiftPlan[] {
-  return catalog.options
+  const options = catalog.options
     .filter((option) => GIFT_DURATIONS.includes(option.durationMonths))
-    .sort((a, b) => a.durationMonths - b.durationMonths)
-    .map((option) => {
-      const copy = GIFT_PLAN_COPY[option.durationMonths];
-      const perMonthMinor = Math.round(
-        option.unitAmount / option.durationMonths,
-      );
-      const perMonthFormatted = formatMoney(perMonthMinor, catalog.currency);
-      return {
-        ...copy,
-        unitAmount: option.unitAmount,
-        currency: catalog.currency,
-        price: formatMoney(option.unitAmount, catalog.currency),
-        perMonth: `${perMonthFormatted} / month`,
-        perMonthShort: `${perMonthFormatted}/mo`,
-      };
-    });
+    .sort((a, b) => a.durationMonths - b.durationMonths);
+
+  // Savings are measured against the shortest plan's monthly rate. Prices come
+  // from the catalog at runtime, so this is recomputed rather than hardcoded.
+  const baseline = options[0];
+  const baselineRate = baseline
+    ? baseline.unitAmount / baseline.durationMonths
+    : 0;
+
+  return options.map((option) => {
+    const copy = GIFT_PLAN_COPY[option.durationMonths];
+    const rate = option.unitAmount / option.durationMonths;
+    const perMonthFormatted = formatMoney(Math.round(rate), catalog.currency);
+    const percent =
+      baselineRate > 0 ? Math.floor((1 - rate / baselineRate) * 100) : 0;
+    return {
+      ...copy,
+      unitAmount: option.unitAmount,
+      currency: catalog.currency,
+      price: formatMoney(option.unitAmount, catalog.currency),
+      perMonth: `${perMonthFormatted} / month`,
+      perMonthShort: `${perMonthFormatted}/mo`,
+      savings:
+        baseline && option !== baseline && percent >= MIN_SAVINGS_PERCENT
+          ? { percent, versus: GIFT_PLAN_COPY[baseline.durationMonths].name }
+          : null,
+    };
+  });
 }
 
-/** The design pre-selects six months; fall back if the catalog omits it. */
+/**
+ * Pre-selects twelve months, the best-value plan; fall back if the catalog
+ * omits it.
+ */
 export function defaultGiftPlan(plans: GiftPlan[]): GiftPlan | undefined {
-  return plans.find((plan) => plan.durationMonths === 6) ?? plans[0];
+  return plans.find((plan) => plan.durationMonths === 12) ?? plans[0];
 }
 
 export function findGiftPlan(
@@ -100,6 +108,15 @@ export function parseDurationMonths(
 ): GiftDurationMonths | undefined {
   const value = Number(raw);
   return GIFT_DURATIONS.find((duration) => duration === value);
+}
+
+/**
+ * The pill shown on a plan, e.g. "Best value · 21% off" — the saving backs up
+ * the badge. Null when the plan has neither.
+ */
+export function giftBadgeLabel(plan: GiftPlan): string | null {
+  const parts = [plan.badge, plan.savings && `${plan.savings.percent}% off`];
+  return parts.filter(Boolean).join(" · ") || null;
 }
 
 /** The label shared by every "Gift ..." call-to-action on the site. */

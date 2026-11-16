@@ -3,6 +3,7 @@ import { GiftCheckLarge } from "@/icons";
 import {
   defaultGiftPlan,
   findGiftPlan,
+  giftBadgeLabel,
   giftCtaLabel,
   type GiftPlan,
 } from "@/lib/gift/plans";
@@ -15,7 +16,13 @@ interface PlanCardProps {
   onSelect: () => void;
 }
 
+/**
+ * Same hierarchy as the hero's quick-purchase tiles: the duration leads, the
+ * monthly rate is bold (it falls as the plan lengthens, so it carries the
+ * saving), and the one-time total is supporting text.
+ */
 function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
+  const badge = giftBadgeLabel(plan);
   return (
     <div
       className={cn(
@@ -25,31 +32,33 @@ function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
           : "bg-card/30 border border-white/12",
       )}
     >
-      <div className="flex h-5 w-full items-center justify-between">
-        <span className="text-sand-storm text-xs leading-4 font-semibold tracking-[0.96px]">
-          {plan.name.toUpperCase()}
+      {/*
+        Duration top-left, badge top-right, so every card's duration sits on
+        the same line whether or not it has a badge.
+      */}
+      <div className="flex w-full items-start justify-between gap-2">
+        <span
+          className={cn(
+            "font-display text-[40px] leading-[44px] font-medium tracking-[-0.8px] whitespace-nowrap lg:max-xl:text-[34px]",
+            selected ? "text-sand-storm" : "text-white",
+          )}
+        >
+          {plan.name}
         </span>
-        {plan.badge && (
-          <span className="bg-sand-storm rounded-full px-2 py-0.5 text-[10px] leading-[14px] font-semibold text-black">
-            {plan.badge}
+        {badge && (
+          <span className="bg-sand-storm mt-1 shrink-0 rounded-full px-2 py-0.5 text-[10px] leading-[14px] font-semibold whitespace-nowrap text-black">
+            {badge}
           </span>
         )}
       </div>
 
-      <p className="font-display min-h-14 w-full text-2xl leading-7 font-normal text-white">
-        {plan.tagline}
-      </p>
-
       <div className="flex w-full flex-col items-start gap-0.5">
-        <div className="flex items-end gap-2">
-          <span className="font-display text-[40px] leading-[44px] font-medium tracking-[-0.8px] text-white">
-            {plan.price}
-          </span>
-          <span className="pb-1.5 text-[13px] leading-[18px] text-zinc-300/80">
-            one-time
-          </span>
-        </div>
-        <span className="text-sm leading-5 text-zinc-300">{plan.perMonth}</span>
+        <span className="text-2xl leading-8 font-semibold text-white">
+          {plan.perMonthShort}
+        </span>
+        <span className="text-sm leading-5 text-zinc-300/80">
+          {plan.price} total
+        </span>
       </div>
 
       <button
