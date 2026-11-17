@@ -75,6 +75,7 @@ const initialDurationMonths = parseDurationMonths(
     }
     <form
       method="post"
+      novalidate
       class="grid grid-cols-1 items-start gap-x-16 gap-y-7 lg:grid-cols-[minmax(0,34rem)_26rem] lg:grid-rows-[auto_1fr] lg:justify-center lg:gap-y-8 xl:gap-x-24"
     >
       <div
@@ -140,16 +141,90 @@ const initialDurationMonths = parseDurationMonths(
   const fieldSlots = () =>
     document.querySelectorAll<HTMLElement>("[data-error-for]");
 
+  /** Shows `message` under the field, or clears it when null. */
+  function setFieldError(id: string, message: string | null) {
+    const slot = document.querySelector<HTMLElement>(
+      `[data-error-for="${id}"]`,
+    );
+    const field = document.getElementById(id);
+    if (slot) {
+      slot.textContent = message ?? "";
+      slot.classList.toggle("hidden", !message);
+    }
+    if (message) field?.setAttribute("aria-invalid", "true");
+    else field?.removeAttribute("aria-invalid");
+  }
+
   function clearErrors() {
     banner?.classList.add("hidden");
     if (banner) banner.textContent = "";
-    for (const slot of fieldSlots()) {
-      slot.classList.add("hidden");
-      slot.textContent = "";
-      const field = document.getElementById(slot.dataset.errorFor ?? "");
-      field?.removeAttribute("aria-invalid");
-    }
+    for (const slot of fieldSlots())
+      setFieldError(slot.dataset.errorFor ?? "", null);
   }
+
+  /**
+   * Scrolls the field to the middle of the screen, clear of the sticky header
+   * and the mobile checkout bar, then moves focus there without a second jump.
+   */
+  function focusField(id: string) {
+    const field = document.getElementById(id);
+    if (!field) return;
+    field.scrollIntoView({ behavior: "smooth", block: "center" });
+    field.focus({ preventScroll: true });
+  }
+
+  type FieldElement = HTMLInputElement | HTMLTextAreaElement;
+
+  /**
+   * The checks run in the browser, in form order. The form is `novalidate`, so
+   * these replace the browser's own bubbles and every problem shows at once.
+   * They only catch what is plainly missing or malformed: the server still
+   * validates everything, and its field errors land in the same slots.
+   */
+  const RULES: Record<string, (field: FieldElement) => string | null> = {
+    recipientName: (field) => (field.value.trim() ? null : "Enter their name."),
+    recipientPhone: (field) => {
+      const digits = field.value.replace(/\D/g, "");
+      if (!digits) return "Enter their phone number.";
+      // A loose floor: the server parses the number properly.
+      if (digits.length < 7)
+        return "Enter their full number, including the area code.";
+      return null;
+    },
+    senderName: (field) => (field.value.trim() ? null : "Enter your name."),
+    senderEmail: (field) => {
+      if (!field.value.trim()) return "Enter an email for your receipt.";
+      if (field.validity.typeMismatch) return "Enter a valid email address.";
+      return null;
+    },
+  };
+
+  const checkField = (id: string) => {
+    const field = document.getElementById(id) as FieldElement | null;
+    return field ? RULES[id](field) : null;
+  };
+
+  /** Marks every failing field and returns the first one's id, if any. */
+  function validateForm(): string | undefined {
+    let first: string | undefined;
+    for (const id of Object.keys(RULES)) {
+      const message = checkField(id);
+      setFieldError(id, message);
+      if (message && !first) first = id;
+    }
+    return first;
+  }
+
+  /*
+   * Once a field is showing an error, re-check it as they type so the message
+   * clears the moment it is fixed. Fields without an error are left alone until
+   * the next submit, so nobody is told off halfway through typing.
+   */
+  form?.addEventListener("input", (event) => {
+    const field = event.target as FieldElement;
+    if (field.getAttribute("aria-invalid") !== "true") return;
+    setFieldError(field.id, RULES[field.id] ? checkField(field.id) : null);
+  });
 
   function showBanner(message: string) {
     if (!banner) return;
@@ -166,7 +241,7 @@ const initialDurationMonths = parseDurationMonths(
   };
 
   function showFieldErrors(errors: Record<string, string>) {
-    let unmapped: string[] = [];
+    const unmapped: string[] = [];
     for (const [path, message] of Object.entries(errors)) {
       const id = FIELD_FOR_PATH[path];
       const slot = id
@@ -176,15 +251,17 @@ const initialDurationMonths = parseDurationMonths(
         unmapped.push(message);
         continue;
       }
-      slot.textContent = message;
-      slot.classList.remove("hidden");
-      document.getElementById(id)?.setAttribute("aria-invalid", "true");
+      setFieldError(id, message);
     }
-    if (unmapped.length > 0) showBanner(unmapped.join(" "));
-    else
-      document
-        .querySelector("[data-error-for]:not(.hidden)")
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (unmapped.length > 0) {
+      showBanner(unmapped.join(" "));
+      return;
+    }
+    // Slots are in form order, so the first visible one is the topmost field.
+    const first = document.querySelector<HTMLElement>(
+      "[data-error-for]:not(.hidden)",
+    );
+    if (first?.dataset.errorFor) focusField(first.dataset.errorFor);
   }
 
   function setBusy(busy: boolean) {
@@ -199,9 +276,15 @@ const initialDurationMonths = parseDurationMonths(
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (submitting || !form.reportValidity()) return;
+    if (submitting) return;
 
     clearErrors();
+    const firstInvalid = validateForm();
+    if (firstInvalid) {
+      focusField(firstInvalid);
+      return;
+    }
+
     setBusy(true);
 
     const data = new FormData(form);

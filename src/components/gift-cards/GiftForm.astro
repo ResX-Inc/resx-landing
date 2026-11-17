@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
+import { ScheduleFields } from "./ScheduleFields";
 import { cn } from "@/lib/utils";
 import type { HTMLAttributes } from "astro/types";
 
@@ -10,18 +11,22 @@ interface Props extends HTMLAttributes<"div"> {}
 const { class: className, ...rest } = Astro.props;
 
 /**
- * The left column of /gift-cards/buy. Every field is uncontrolled, so this
- * renders as plain HTML with no island — the primitives are React components
- * but Astro renders them on the server without hydrating.
+ * The left column of /gift-cards/buy. Every field is uncontrolled plain HTML
+ * except the schedule, which is a small island (ScheduleFields) for its
+ * calendar and time slots.
  *
- * Layout: three numbered steps separated by hairlines, each with a two-column
- * field grid from `sm` up. Helper and error text sit directly under the field
- * they describe. The page script finds error slots by `data-error-for`, not by
- * position, so they can live inside each field's column.
+ * Layout: two headed sections, "Their info" (recipient, message, delivery)
+ * then "Your info" (sender), with a hairline between them. Field grids are
+ * two columns from `sm` up. An error sits directly under its field, above any
+ * helper text, so it is the first thing read after the input.
+ *
+ * Every field with a rule has an error slot (`data-error-for`). The page
+ * script fills them, both from its own checks on submit and from the server's
+ * field errors, and finds them by attribute rather than position.
  */
 
-const sectionClass =
-  "flex w-full flex-col items-start gap-4 border-t border-white/8 pt-7 first-of-type:border-t-0 first-of-type:pt-0";
+const sectionClass = "flex w-full flex-col items-start gap-5";
+const headingClass = "font-display text-lg leading-6 font-medium text-white";
 const fieldClass = "flex min-w-0 flex-col gap-1.5";
 const hintClass = "text-xs leading-4 text-zinc-300/70";
 const errorClass = "text-destructive hidden text-xs leading-4";
@@ -35,18 +40,8 @@ const errorClass = "text-destructive hidden text-xs leading-4";
   >
   </p>
 
-  <section class={sectionClass}>
-    <h2
-      class="font-display flex items-center gap-2.5 text-lg leading-6 font-medium text-white"
-    >
-      <span
-        aria-hidden="true"
-        class="border-sand-storm/50 text-sand-storm flex size-6 items-center justify-center rounded-full border font-sans text-xs font-semibold"
-        >1</span
-      >
-      Who it's for
-    </h2>
-
+  <section aria-labelledby="gift-their-info" class={sectionClass}>
+    <h2 id="gift-their-info" class={headingClass}>Their info</h2>
     <div class="grid w-full grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
       <div class={fieldClass}>
         <Label htmlFor="recipientName">Their name</Label>
@@ -57,6 +52,7 @@ const errorClass = "text-destructive hidden text-xs leading-4";
           required
           placeholder="Alex Moreau"
         />
+        <p data-error-for="recipientName" class={errorClass} role="alert"></p>
       </div>
       <div class={fieldClass}>
         <Label htmlFor="recipientPhone">Their phone number</Label>
@@ -68,10 +64,10 @@ const errorClass = "text-destructive hidden text-xs leading-4";
           required
           placeholder="+1 (234) 567-8900"
         />
-        <p class={hintClass}>
-          We text the gift here. It locks to the ResX account with this number.
-        </p>
         <p data-error-for="recipientPhone" class={errorClass} role="alert"></p>
+        <p class={hintClass}>
+          They'll need to have an account with this number.
+        </p>
       </div>
 
       <div class={cn(fieldClass, "sm:col-span-2")}>
@@ -88,48 +84,17 @@ const errorClass = "text-destructive hidden text-xs leading-4";
         <p data-error-for="message" class={errorClass} role="alert"></p>
       </div>
     </div>
+
+    <ScheduleFields client:load>
+      <p data-error-for="sendDate" class={errorClass} role="alert"></p>
+    </ScheduleFields>
   </section>
 
-  <section class={sectionClass}>
-    <h2
-      class="font-display flex items-center gap-2.5 text-lg leading-6 font-medium text-white"
-    >
-      <span
-        aria-hidden="true"
-        class="border-sand-storm/50 text-sand-storm flex size-6 items-center justify-center rounded-full border font-sans text-xs font-semibold"
-        >2</span
-      >
-      Schedule your gift
-    </h2>
-
-    <div class="grid w-full grid-cols-2 gap-x-3 gap-y-1.5">
-      <div class={fieldClass}>
-        <Label htmlFor="sendDate">Date</Label>
-        <Input id="sendDate" name="sendDate" type="date" />
-        <p data-error-for="sendDate" class={errorClass} role="alert"></p>
-      </div>
-      <div class={fieldClass}>
-        <Label htmlFor="sendTime">Time</Label>
-        <Input id="sendTime" name="sendTime" type="time" />
-      </div>
-      <p class={cn(hintClass, "col-span-2")}>
-        Their local time, any time up to 12 months out.
-      </p>
-    </div>
-  </section>
-
-  <section class={sectionClass}>
-    <h2
-      class="font-display flex items-center gap-2.5 text-lg leading-6 font-medium text-white"
-    >
-      <span
-        aria-hidden="true"
-        class="border-sand-storm/50 text-sand-storm flex size-6 items-center justify-center rounded-full border font-sans text-xs font-semibold"
-        >3</span
-      >
-      From
-    </h2>
-
+  <section
+    aria-labelledby="gift-your-info"
+    class={cn(sectionClass, "border-t border-white/8 pt-7")}
+  >
+    <h2 id="gift-your-info" class={headingClass}>Your info</h2>
     <div class="grid w-full grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
       <div class={fieldClass}>
         <Label htmlFor="senderName">Your name</Label>
@@ -140,6 +105,7 @@ const errorClass = "text-destructive hidden text-xs leading-4";
           required
           placeholder="Jordan Lee"
         />
+        <p data-error-for="senderName" class={errorClass} role="alert"></p>
       </div>
       <div class={fieldClass}>
         <Label htmlFor="senderEmail">Email for your receipt</Label>
@@ -151,27 +117,8 @@ const errorClass = "text-destructive hidden text-xs leading-4";
           required
           placeholder="hello@you.com"
         />
+        <p data-error-for="senderEmail" class={errorClass} role="alert"></p>
       </div>
     </div>
   </section>
 </div>
-
-<script>
-  /*
-   * Default the schedule to now. This runs on the client on purpose: the
-   * server's clock and timezone are not the sender's, and the field is
-   * labelled as the recipient's local time.
-   */
-  const pad = (value: number) => String(value).padStart(2, "0");
-  const now = new Date();
-
-  const date = document.getElementById("sendDate") as HTMLInputElement | null;
-  const time = document.getElementById("sendTime") as HTMLInputElement | null;
-
-  if (date && !date.value) {
-    date.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  }
-  if (time && !time.value) {
-    time.value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  }
-</script>

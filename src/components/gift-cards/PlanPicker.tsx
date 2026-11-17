@@ -18,25 +18,31 @@ interface PlanCardProps {
 
 /**
  * Same hierarchy as the hero's quick-purchase tiles: the duration leads, the
- * monthly rate is bold (it falls as the plan lengthens, so it carries the
- * saving), and the one-time total is supporting text.
+ * total is bold, and the monthly rate is supporting text.
  */
 function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
   const badge = giftBadgeLabel(plan);
+  // The whole card is the control, like the hero's quick-purchase tiles. A
+  // button only holds phrasing content, so the layout uses spans.
   return (
-    <div
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
       className={cn(
-        "flex min-w-0 flex-1 flex-col items-start gap-5 self-stretch rounded-2xl p-6 transition-colors",
+        "group flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-5 self-stretch rounded-2xl p-6 text-left transition-colors",
+        "focus-visible:ring-ring focus-visible:ring-1 focus-visible:outline-none",
         selected
           ? "bg-sand-storm/8 border-sand-storm border-[1.5px]"
-          : "bg-card/30 border border-white/12",
+          : "bg-card/30 border border-white/12 hover:border-white/25",
       )}
     >
       {/*
         Duration top-left, badge top-right, so every card's duration sits on
         the same line whether or not it has a badge.
       */}
-      <div className="flex w-full items-start justify-between gap-2">
+      <span className="flex w-full items-start justify-between gap-2">
         <span
           className={cn(
             "font-display text-[40px] leading-[44px] font-medium tracking-[-0.8px] whitespace-nowrap lg:max-xl:text-[34px]",
@@ -50,34 +56,31 @@ function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
             {badge}
           </span>
         )}
-      </div>
+      </span>
 
-      <div className="flex w-full flex-col items-start gap-0.5">
+      <span className="flex w-full flex-col items-start gap-0.5">
         <span className="text-2xl leading-8 font-semibold text-white">
-          {plan.perMonthShort}
+          {plan.price}
         </span>
         <span className="text-sm leading-5 text-zinc-300/80">
-          {plan.price} total
+          {plan.perMonthShort}
         </span>
-      </div>
+      </span>
 
-      <button
-        type="button"
-        aria-pressed={selected}
-        onClick={onSelect}
+      {/* Visual only: the card itself is the radio, and aria-checked says it. */}
+      <span
+        aria-hidden="true"
         className={cn(
-          "flex h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-full text-sm leading-5 font-semibold transition-colors",
-          "focus-visible:ring-ring focus-visible:ring-1 focus-visible:outline-none",
+          "flex h-11 w-full items-center justify-center gap-1.5 rounded-full text-sm leading-5 font-semibold transition-colors",
           selected
             ? "bg-sand-storm text-black"
-            : "border border-white/20 text-white hover:border-white/40",
+            : "border border-white/20 text-white group-hover:border-white/40",
         )}
       >
         {selected && <GiftCheckLarge className="size-4" />}
         {selected ? "Selected" : "Select"}
-        <span className="sr-only"> {plan.name}</span>
-      </button>
-    </div>
+      </span>
+    </button>
   );
 }
 
@@ -89,7 +92,10 @@ export function PlanPicker({ plans }: { plans: GiftPlan[] }) {
   return (
     <div className="flex w-full flex-col items-start gap-8">
       <div className="flex w-full flex-wrap items-end justify-between gap-4">
-        <h2 className="font-display text-5xl leading-[52px] font-normal text-white">
+        <h2
+          id="gift-plan-picker-label"
+          className="font-display text-5xl leading-[52px] font-normal text-white"
+        >
           Pick their plan
         </h2>
         <p className="text-base leading-6 text-white/80">
@@ -97,7 +103,11 @@ export function PlanPicker({ plans }: { plans: GiftPlan[] }) {
         </p>
       </div>
 
-      <div className="flex w-full items-stretch gap-4 max-lg:flex-col">
+      <div
+        role="radiogroup"
+        aria-labelledby="gift-plan-picker-label"
+        className="flex w-full items-stretch gap-4 max-lg:flex-col"
+      >
         {plans.map((candidate) => (
           <PlanCard
             key={candidate.durationMonths}

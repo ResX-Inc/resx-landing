@@ -17,9 +17,8 @@ interface PlanTileProps {
 }
 
 /**
- * Leads with what they're getting (the duration), then the monthly rate in
- * bold — the number that falls as the plan gets longer, so it carries the
- * savings — with the one-time total as supporting text.
+ * Leads with what they're getting (the duration), then the total in bold,
+ * with the monthly rate as supporting text.
  *
  * Desktop tiles are columns; on phones each tile is a full-width row (duration
  * left, pricing right), since three columns at that width wrap "12 months".
@@ -67,10 +66,10 @@ function PlanTile({ plan, selected, onSelect }: PlanTileProps) {
 
       <span className="flex shrink-0 flex-col items-end gap-px sm:items-start">
         <span className="text-base leading-6 font-semibold text-white">
-          {plan.perMonthShort}
+          {plan.price}
         </span>
         <span className="text-[12px] leading-4 text-zinc-300/80">
-          {plan.price} total
+          {plan.perMonthShort}
         </span>
       </span>
     </button>
@@ -122,7 +121,7 @@ export function QuickPurchase({ plans }: { plans: GiftPlan[] }) {
             One-time purchase. Never expires.
           </span>
           <span className="text-zinc-300/80">
-            Delivered by text, now or on a date you pick.
+            Delivered by text on the day you pick.
           </span>
         </div>
       </div>

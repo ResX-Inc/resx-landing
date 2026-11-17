@@ -41,8 +41,7 @@ interface CompactPlanTileProps {
 
 /**
  * Same hierarchy as the landing page's plan tiles: the duration leads, the
- * monthly rate is bold (it carries the saving), and the total is supporting
- * text.
+ * total is bold, and the monthly rate is supporting text.
  *
  * Below lg each tile is a full-width row with a radio, like the landing page.
  * On desktop the three tiles share a narrow summary card (~116px each), which
@@ -98,10 +97,10 @@ function CompactPlanTile({ plan, selected, onSelect }: CompactPlanTileProps) {
 
       <span className="flex shrink-0 flex-col items-end gap-px lg:items-start">
         <span className="text-base leading-6 font-semibold text-white lg:text-[15px] lg:leading-5">
-          {plan.perMonthShort}
+          {plan.price}
         </span>
         <span className="text-xs leading-4 text-zinc-300/80">
-          {plan.price} total
+          {plan.perMonthShort}
         </span>
       </span>
     </button>

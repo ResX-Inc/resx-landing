@@ -4,6 +4,7 @@ import type { GiftPlan } from "@/lib/gift/plans";
 
 import GiftCardArt from "./GiftCardArt.astro";
 import { QuickPurchase } from "./QuickPurchase";
+import { Title } from "../hero";
 
 interface Props {
   plans: GiftPlan[];
@@ -16,7 +17,7 @@ const { plans } = Astro.props;
   <div
     class="flex items-center justify-between gap-16 max-lg:flex-col max-lg:items-start"
   >
-    <div class="flex w-full max-w-150 flex-col items-start gap-6">
+    <div class="flex w-full max-w-200 flex-col items-start gap-6">
       <span
         class="bg-premium flex items-center gap-1 rounded-md py-1 pr-2.5 pl-2"
       >
@@ -27,17 +28,15 @@ const { plans } = Astro.props;
         >
       </span>
 
-      <h1
-        class="font-display text-[50px] leading-[56px] font-normal tracking-[-2.16px] text-white max-sm:text-[36px] max-sm:leading-[42px]"
-      >
+      <Title className="text-[4rem]">
         For the person who has everything, except a<span
-          class="text-sand-storm text-[56px] leading-[56px] tracking-normal max-sm:text-[42px]"
+          class="text-sand-storm"
         >
           West Village reservation.</span
         >
-      </h1>
+      </Title>
 
-      <p class="max-w-135 text-lg leading-7 text-white/80">
+      <p class="font-avenir max-w-135 text-lg leading-7 text-white/80">
         Give first access to New York and London's hardest-to-get tables. Pick a
         plan and we'll text them a link to claim it.
       </p>
