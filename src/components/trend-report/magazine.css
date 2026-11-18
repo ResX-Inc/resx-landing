@@ -290,15 +290,17 @@
 
 /* 01 · Cover */
 
+/*
+ * Full bleed, with a little overscan top and bottom for the Drift. It runs
+ * past the right edge so the building sits right of the cover lines, as the
+ * still did.
+ */
 .pulse-cover-photo {
   position: absolute;
-  left: 8.95cqw;
-  top: -1.59cqw;
-  width: 105.51cqw;
-  height: 131cqw;
+  inset: -1.59cqw -22cqw -1.59cqw 0;
 }
 
-/* Darkens the middle of the photo so the cover lines read over it. */
+/* Darkens the middle of the video so the cover lines read over it. */
 .pulse-cover-photo::after {
   content: "";
   position: absolute;
