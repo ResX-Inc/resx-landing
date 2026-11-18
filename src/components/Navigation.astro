@@ -3,6 +3,7 @@ import { getEntry } from "astro:content";
 import { buttonVariants } from "@/components/ui/Button";
 import { NavigationBar } from "@/components/ui/NavigationBar";
 import { Stack } from "@/components/ui/Stack";
+import DownloadDialog from "@/components/download/DownloadDialog.astro";
 import { cn } from "@/lib/utils";
 import Logo from "~icons/assets/logo";
 
@@ -64,6 +65,7 @@ const cta = navigation?.data.cta && (await getEntry(navigation.data.cta));
                 "my-4 max-md:h-12 max-md:w-full max-md:text-lg",
               )}
               href={cta.data.url}
+              data-download-trigger
             >
               {cta.data.title}
             </a>
@@ -73,3 +75,5 @@ const cta = navigation?.data.cta && (await getEntry(navigation.data.cta));
     </NavigationBar>
   </div>
 </nav>
+
+<DownloadDialog />

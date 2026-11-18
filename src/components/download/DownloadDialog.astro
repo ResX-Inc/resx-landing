@@ -1,0 +1,129 @@
+---
+/**
+ * Desktop "Download" popup.
+ *
+ * Any link marked with `data-download-trigger` opens this dialog instead of
+ * navigating when the visitor is on a desktop browser, so they can scan a QR
+ * code with their phone rather than being bounced to a store page they can't
+ * install from. On phones and tablets the link navigates as usual (/download
+ * redirects to the right store).
+ */
+import { getEntries } from "astro:content";
+
+import { GradientBorder } from "@/components/ui/GradientBorder";
+import { QRCode } from "@/components/ui/QRCode";
+import { Close } from "@/icons";
+
+import iconSvg from "@/assets/svg/icon.svg?raw";
+
+const [ios, android] = await getEntries([
+  { collection: "links", id: "download-ios" },
+  { collection: "links", id: "download-android" },
+]);
+
+// The nav's own tracked short link, so its scans are counted separately.
+const qrUrl = "https://qrco.de/bgPQWP";
+
+// The ResX icon fills its path with a gradient whose id is "a". Every other
+// QR code on the page uses the same icon, and SVG `url(#a)` resolves to the
+// first matching id in the document. This dialog renders right after the nav,
+// so its copy would come first, and while the dialog is closed (display: none)
+// that gradient doesn't paint, blanking out the logo in every other QR code.
+// Inlining the icon with a unique id keeps the copies independent.
+const icon = iconSvg
+  .replaceAll('id="a"', 'id="download-dialog-icon-gradient"')
+  .replaceAll("url(#a)", "url(#download-dialog-icon-gradient)");
+---
+
+<dialog
+  id="download-dialog"
+  aria-labelledby="download-dialog-title"
+  class="bg-background text-foreground backdrop:bg-black/70 backdrop:backdrop-blur-sm m-auto w-[min(24rem,calc(100vw-2rem))] rounded-3xl border p-0 shadow-2xl"
+>
+  <button
+    type="button"
+    data-download-close
+    class="text-muted-foreground hover:text-primary absolute top-4 right-4 cursor-pointer rounded-full p-1 transition-colors"
+  >
+    <Close className="size-5" />
+    <span class="sr-only">Close</span>
+  </button>
+
+  <div class="flex flex-col items-center gap-6 p-8 text-center">
+    <div class="space-y-2">
+      <h2 id="download-dialog-title" class="text-2xl font-medium">
+        Get the ResX app
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        Scan with your phone's camera to download.
+      </p>
+    </div>
+
+    <GradientBorder
+      className="before:bg-bronze bg-coal rounded-xl bg-black p-3 shadow-lg"
+    >
+      <QRCode value={qrUrl} className="aspect-square w-48">
+        <Fragment set:html={icon} />
+      </QRCode>
+    </GradientBorder>
+
+    <p class="text-muted-foreground text-xs">
+      Or open on
+      <a
+        class="text-foreground hover:text-primary underline underline-offset-4"
+        href={ios?.data.url}
+        target="_blank"
+        rel="noopener">App Store</a
+      >
+      or
+      <a
+        class="text-foreground hover:text-primary underline underline-offset-4"
+        href={android?.data.url}
+        target="_blank"
+        rel="noopener">Google Play</a
+      >
+    </p>
+  </div>
+</dialog>
+
+<script>
+  function isMobileDevice() {
+    const uaData = (
+      navigator as Navigator & { userAgentData?: { mobile?: boolean } }
+    ).userAgentData;
+    if (uaData?.mobile) return true;
+
+    const ua = navigator.userAgent;
+    if (/Android|iPhone|iPad|iPod|Mobile/i.test(ua)) return true;
+
+    // iPadOS Safari reports itself as a Mac; touch support gives it away.
+    return /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  }
+
+  const dialog = document.getElementById(
+    "download-dialog",
+  ) as HTMLDialogElement | null;
+
+  if (dialog) {
+    document.addEventListener("click", (event) => {
+      const target = event.target as Element | null;
+
+      const trigger = target?.closest("[data-download-trigger]");
+      if (trigger) {
+        // Let modifier-clicks (new tab, etc.) and mobile devices through.
+        const e = event as MouseEvent;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        if (isMobileDevice()) return;
+
+        event.preventDefault();
+        dialog.showModal();
+        return;
+      }
+
+      // Close via the X button or by clicking the backdrop.
+      if (target?.closest("[data-download-close]") || target === dialog) {
+        dialog.close();
+      }
+    });
+  }
+</script>
