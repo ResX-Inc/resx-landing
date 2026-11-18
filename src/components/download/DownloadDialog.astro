@@ -14,7 +14,7 @@ import { GradientBorder } from "@/components/ui/GradientBorder";
 import { QRCode } from "@/components/ui/QRCode";
 import { Close } from "@/icons";
 
-import Icon from "~icons/assets/icon";
+import iconSvg from "@/assets/svg/icon.svg?raw";
 
 const [ios, android] = await getEntries([
   { collection: "links", id: "download-ios" },
@@ -23,6 +23,16 @@ const [ios, android] = await getEntries([
 
 // The nav's own tracked short link, so its scans are counted separately.
 const qrUrl = "https://qrco.de/bgPQWP";
+
+// The ResX icon fills its path with a gradient whose id is "a". Every other
+// QR code on the page uses the same icon, and SVG `url(#a)` resolves to the
+// first matching id in the document. This dialog renders right after the nav,
+// so its copy would come first, and while the dialog is closed (display: none)
+// that gradient doesn't paint, blanking out the logo in every other QR code.
+// Inlining the icon with a unique id keeps the copies independent.
+const icon = iconSvg
+  .replaceAll('id="a"', 'id="download-dialog-icon-gradient"')
+  .replaceAll("url(#a)", "url(#download-dialog-icon-gradient)");
 ---
 
 <dialog
@@ -53,7 +63,7 @@ const qrUrl = "https://qrco.de/bgPQWP";
       className="before:bg-bronze bg-coal rounded-xl bg-black p-3 shadow-lg"
     >
       <QRCode value={qrUrl} className="aspect-square w-48">
-        <Icon />
+        <Fragment set:html={icon} />
       </QRCode>
     </GradientBorder>
 
