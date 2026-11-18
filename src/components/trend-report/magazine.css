@@ -1,0 +1,404 @@
+/*
+ * The ResX Pulse: a magazine whose pages turn on scroll.
+ *
+ * Everything inside a page is sized in container units (cqw / cqh) so a page
+ * behaves like a printed object: it scales as a whole, and its layout never
+ * reflows between a laptop and a phone.
+ */
+
+.mag-scroll,
+.mag-static {
+  /* The Pulse is designed on an 816 × 1056 (US Letter) artboard. */
+  --page-ratio: calc(816 / 1056);
+  /*
+   * The stage keeps a small gutter above the pages and room for the folio
+   * below; the site header slides away while reading, so the pages get the
+   * rest of the screen.
+   */
+  --stage-top: 20px;
+  --stage-bottom: 52px;
+  --page-h: min(
+    calc(100svh - var(--stage-top) - var(--stage-bottom)),
+    calc((100vw - 96px) / 2 / var(--page-ratio))
+  );
+  --page-w: calc(var(--page-h) * var(--page-ratio));
+}
+
+/* Phones show one page at a time, as wide as the screen allows. */
+@media (max-width: 767px) {
+  .mag-scroll,
+  .mag-static {
+    --page-w: min(
+      calc(100vw - 32px),
+      calc(
+        (100svh - var(--stage-top) - var(--stage-bottom)) * var(--page-ratio)
+      )
+    );
+    --page-h: calc(var(--page-w) / var(--page-ratio));
+  }
+}
+
+/* --------------------------------- Stage ---------------------------------- */
+
+.mag-scroll {
+  position: relative;
+}
+
+.mag-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--stage-top) 0 var(--stage-bottom);
+  /* A pool of warm light on the table the magazine is lying on. */
+  background: radial-gradient(
+    ellipse 60% 55% at 50% 56%,
+    color-mix(in oklab, var(--color-sand-storm) 9%, transparent),
+    transparent 70%
+  );
+}
+
+/*
+ * When the site header is showing, the pages shrink and drop just enough to
+ * clear it (values set by useImmersiveNav); while reading they fill the stage.
+ */
+.mag-frame {
+  transform: translateY(var(--mag-drop, 0px)) scale(var(--mag-fit, 1));
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:root[data-mag-immersive] .mag-frame {
+  transform: none;
+}
+
+.mag-book {
+  position: relative;
+  width: calc(var(--page-w) * 2);
+  height: var(--page-h);
+  flex: none;
+}
+
+.mag-leaf {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--page-w);
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.mag-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Matches the Pulse page colour so no light edge shows at the trim. */
+  background: #0a0a0a;
+}
+
+.mag-face--front {
+  border-radius: 0 3px 3px 0;
+}
+
+.mag-face--back {
+  transform: rotateY(180deg);
+  border-radius: 3px 0 0 3px;
+}
+
+/* The gutter: paper curving into the spine. */
+.mag-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.mag-face--front::after {
+  background: linear-gradient(
+    to right,
+    rgb(0 0 0 / 0.28),
+    rgb(0 0 0 / 0.06) 4%,
+    transparent 9%
+  );
+}
+
+.mag-face--back::after {
+  background: linear-gradient(
+    to left,
+    rgb(0 0 0 / 0.28),
+    rgb(0 0 0 / 0.06) 4%,
+    transparent 9%
+  );
+}
+
+.mag-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.mag-shade--front {
+  background: linear-gradient(to left, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.2));
+}
+
+.mag-shade--back {
+  background: linear-gradient(to right, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.2));
+}
+
+.mag-cast {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: var(--page-w);
+  pointer-events: none;
+}
+
+.mag-cast--right {
+  left: 50%;
+  background: linear-gradient(to right, rgb(0 0 0 / 0.5), transparent 75%);
+}
+
+.mag-cast--left {
+  left: calc(50% - var(--page-w));
+  background: linear-gradient(to left, rgb(0 0 0 / 0.5), transparent 75%);
+}
+
+.mag-chrome {
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--stage-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.mag-hint,
+.mag-folio {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.mag-hint {
+  position: absolute;
+}
+
+.mag-folio {
+  transition: opacity 0.3s;
+}
+
+.mag-page-slot {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+}
+
+/* --------------------------- Reduced-motion view --------------------------- */
+
+.mag-static {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding: 120px 16px 72px;
+}
+
+.mag-static-spread {
+  display: flex;
+  box-shadow: 0 30px 60px rgb(0 0 0 / 0.35);
+}
+
+.mag-static-spread--single {
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: none;
+}
+
+.mag-static-page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  container-type: size;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+/* --------------------------------- Pages --------------------------------- */
+
+/* The blank back of a page on phones, in the Pulse's near-black. */
+.mag-page--reverse {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to left, rgb(255 255 255 / 0.04), transparent 30%), #0a0a0a;
+}
+
+.mag-link {
+  border-radius: 2px;
+  outline-offset: 3px;
+}
+
+.mag-link:focus-visible {
+  outline: 2px solid var(--color-sand-storm);
+}
+
+/* ------------------------------- Pulse pages ------------------------------- */
+
+/*
+ * Shared pieces of the ResX Pulse layouts. Sizes are Figma px ÷ 8.16 (cqw);
+ * the smallest labels keep a legible floor on phones.
+ */
+
+.pulse-page {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0a0a0a;
+  color: #fff;
+  font-family: var(--font-sans);
+}
+
+/* Running header / footer labels: 9px semibold, tracked, uppercase. */
+.pulse-label {
+  font-size: max(6px, 1.103cqw);
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.6);
+}
+
+/* Sand eyebrow: 11px bold, tracked, uppercase. */
+.pulse-eyebrow {
+  font-size: max(7px, 1.348cqw);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-sand-storm);
+}
+
+/* 01 · Cover */
+
+.pulse-cover-photo {
+  position: absolute;
+  left: 8.95cqw;
+  top: -1.59cqw;
+  width: 105.51cqw;
+  height: 131cqw;
+}
+
+/* Darkens the middle of the photo so the cover lines read over it. */
+.pulse-cover-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 861 1069' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)' opacity='0.4000000059604645'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(-50.182 54.075 -43.554 -40.479 406.03 462.61)'><stop stop-color='rgba(10,10,10,1)' offset='0'/><stop stop-color='rgba(10,10,10,0.96436)' offset='0.22121'/><stop stop-color='rgba(10,10,10,0.2)' offset='1'/></radialGradient></defs></svg>");
+  background-size: 100% 100%;
+}
+
+.pulse-cover-title {
+  font-size: 12.745cqw;
+  line-height: 0.92;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.pulse-cover-subtitle {
+  font-size: 3.799cqw;
+  line-height: 1.18;
+  letter-spacing: -0.0649em;
+  white-space: nowrap;
+  color: var(--color-sand-storm);
+}
+
+/* ------------------------------ Site header ------------------------------- */
+
+/*
+ * The site header (Navigation.astro, the first child of <main>) tucks away
+ * while the magazine is being read. `transform` composes with the header's
+ * own `translate` centring, so it slides straight up.
+ */
+:root:has(.mag-scroll) main > nav {
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:root[data-mag-immersive]:not([data-mag-peek]) main > nav:not(:focus-within) {
+  transform: translateY(calc(-100% - 24px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mag-frame,
+  :root:has(.mag-scroll) main > nav {
+    transition: none;
+  }
+}
+
+/* Running header label (8.5px) and page number (9px) on inner pages. */
+.pulse-running {
+  font-size: max(5px, 1.042cqw);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.pulse-folio {
+  font-size: max(5px, 1.103cqw);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Full-bleed photo knocked back to near black behind the text. */
+.pulse-backdrop {
+  overflow: hidden;
+}
+
+.pulse-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.81);
+  pointer-events: none;
+}
+
+/* Sand hairline under a page's headline. */
+.pulse-rule {
+  height: 1px;
+  background: rgb(255 217 161 / 0.51);
+}
+
+/* 02 · Intro */
+
+.pulse-intro-headline {
+  font-size: 6.127cqw;
+  line-height: 1.08;
+  font-weight: 600;
+  letter-spacing: -0.0623em;
+}
+
+.pulse-intro-accent {
+  letter-spacing: -0.0572em;
+  color: var(--color-sand-storm);
+}
+
+.pulse-intro-body {
+  font-size: 2.451cqw;
+  line-height: 1.6;
+  letter-spacing: -0.0431em;
+  color: rgb(255 255 255 / 0.82);
+}

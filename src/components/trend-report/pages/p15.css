@@ -1,0 +1,108 @@
+/* 15 · The Summer New York Became a Stadium. Figma px ÷ 8.16 = cqw. */
+
+.p15-photo {
+  position: absolute;
+  overflow: hidden;
+}
+
+.p15-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.68);
+  pointer-events: none;
+}
+
+.p15-headline {
+  font-size: 6.127cqw;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.0534em;
+}
+
+.p15-subhead {
+  font-size: 2.574cqw;
+  line-height: 1.3;
+  letter-spacing: -0.0541em;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.p15-rule {
+  height: 1px;
+  background: rgb(255 217 161 / 0.35);
+}
+
+.p15-panel {
+  position: relative;
+  height: 100%;
+  border: 1px solid #262626;
+  border-radius: 1.72cqw;
+  background: rgb(20 20 20 / 0.86);
+}
+
+/* 10px bold sand label at the top of a panel. */
+.p15-eyebrow {
+  font-size: 1.225cqw;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-sand-storm);
+}
+
+/* 64px sand figure. */
+.p15-stat {
+  font-size: 7.843cqw;
+  line-height: 0.92;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--color-sand-storm);
+}
+
+/* 9.5px grey caption under or beside a figure. */
+.p15-caption {
+  font-size: max(5px, 1.164cqw);
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.4);
+}
+
+.p15-month {
+  position: absolute;
+  top: 68.29%;
+  translate: -50% 0;
+  font-size: 1.225cqw;
+  line-height: normal;
+  font-weight: 700;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.45);
+}
+
+.p15-day {
+  position: absolute;
+  top: -0.61%;
+  font-size: max(5px, 1.164cqw);
+  line-height: normal;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--color-sand-storm);
+}
+
+.p15-body {
+  font-size: 1.777cqw;
+  line-height: 1.62;
+  color: rgb(255 255 255 / 0.82);
+}
+
+/* Sand dash in front of each paragraph. */
+.p15-dash {
+  position: absolute;
+  top: 1.41cqw;
+  left: 0;
+  width: 1.23cqw;
+  height: 0.18cqw;
+  background: var(--color-sand-storm);
+}

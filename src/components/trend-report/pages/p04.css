@@ -1,0 +1,148 @@
+/* 01 · The Want Ratio. Sizes are Figma px ÷ 8.16 (cqw). */
+
+.p04-title {
+  font-size: 6.127cqw;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.0499em;
+  white-space: nowrap;
+}
+
+.p04-subhead {
+  font-size: 2.574cqw;
+  line-height: 1.3;
+  letter-spacing: -0.0532em;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.p04-rule {
+  height: 1px;
+  background: rgb(255 217 161 / 0.35);
+}
+
+.p04-body {
+  font-size: 1.9cqw;
+  line-height: 1.55;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.p04-lead {
+  font-size: 2.451cqw;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.054em;
+  white-space: nowrap;
+}
+
+.p04-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 27.57cqw);
+  gap: 1.72cqw;
+}
+
+/* A ranked restaurant: photo knocked back under its odds. */
+.p04-tile {
+  position: relative;
+  height: 27.57cqw;
+  overflow: hidden;
+  border: 1px solid rgb(255 217 161 / 0.21);
+  border-radius: 1.72cqw;
+}
+
+.p04-tile-photo {
+  position: absolute;
+}
+
+.p04-tile-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--p04-shade);
+  pointer-events: none;
+}
+
+.p04-pill {
+  position: absolute;
+  top: 1.47cqw;
+  left: 1.47cqw;
+  display: flex;
+  align-items: center;
+  padding: 0.98cqw 1.23cqw;
+  border-radius: 2.08cqw;
+  background: rgb(255 217 161 / 0.2);
+  /* Figma glass: the photo blurs behind the pill and its rim catches light. */
+  backdrop-filter: blur(0.5cqw);
+}
+
+.p04-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    150deg,
+    rgb(255 255 255 / 0.4),
+    rgb(255 255 255 / 0.06) 35%,
+    rgb(255 255 255 / 0.06) 65%,
+    rgb(255 255 255 / 0.3)
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+.p04-pill img {
+  width: 1.47cqw;
+  height: 1.59cqw;
+  margin: 0 0.97cqw 0 0.13cqw;
+}
+
+.p04-pill-name {
+  font-size: 1.471cqw;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.0324em;
+  white-space: nowrap;
+  color: var(--color-sand-storm);
+}
+
+.p04-rank {
+  position: absolute;
+  top: 1.72cqw;
+  font-size: 2.696cqw;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.p04-beat {
+  position: absolute;
+  top: 18.82cqw;
+  left: 1.72cqw;
+  font-size: max(5px, 1.103cqw);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.p04-odds {
+  position: absolute;
+  top: 20.42cqw;
+  left: 1.72cqw;
+  font-size: 5.637cqw;
+  line-height: 0.9;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.p04-caption {
+  font-size: 1.716cqw;
+  line-height: 1.4;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -0.0374em;
+  white-space: nowrap;
+}

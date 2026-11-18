@@ -1,0 +1,55 @@
+---
+/*
+ * Development only: renders one page of the ResX Pulse on its own, at the
+ * Figma artboard size (816 × 1056), with its content in its final resting
+ * state. Use it to compare a page against its Figma frame:
+ *
+ *   /2026-pulse-preview?page=04
+ */
+import type { ComponentType } from "react";
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+if (import.meta.env.PROD) return Astro.redirect("/2026-pulse");
+
+const modules = import.meta.glob<{ default: ComponentType }>(
+  "../components/trend-report/pages/P[0-9][0-9]*.tsx",
+  { eager: true },
+);
+
+const wanted = (Astro.url.searchParams.get("page") ?? "01").padStart(2, "0");
+const entry = Object.entries(modules).find(([path]) =>
+  path.includes(`/P${wanted}`),
+);
+const Page = entry?.[1].default;
+const available = Object.keys(modules)
+  .map((path) => path.match(/\/P(\d\d)/)?.[1])
+  .sort();
+---
+
+<BaseLayout title={`Pulse page ${wanted} preview`}>
+  <style is:global>
+    body {
+      margin: 0;
+      background: #000;
+    }
+    .pulse-preview {
+      position: relative;
+      width: 816px;
+      height: 1056px;
+      container-type: size;
+      overflow: hidden;
+    }
+  </style>
+  {
+    Page ? (
+      <div class="pulse-preview" data-page={wanted}>
+        <Page />
+      </div>
+    ) : (
+      <p style="color:white;padding:24px;font-family:sans-serif">
+        No page {wanted}. Available: {available.join(", ")}
+      </p>
+    )
+  }
+</BaseLayout>

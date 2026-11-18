@@ -1,0 +1,95 @@
+/* 11 · The Most Popular Restaurants. Sizes are Figma px ÷ 8.16 (cqw). */
+
+.p11-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.84);
+  pointer-events: none;
+}
+
+.p11-headline {
+  font-size: 6.127cqw;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.0539em;
+}
+
+.p11-subhead {
+  font-size: 1.9cqw;
+  line-height: 1.55;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.82);
+}
+
+/* Two columns of ten, filled top to bottom. */
+.p11-list {
+  display: grid;
+  grid-template-columns: repeat(2, 40.93cqw);
+  grid-template-rows: repeat(10, 7.84cqw);
+  grid-auto-flow: column;
+  column-gap: 4.41cqw;
+}
+
+.p11-row {
+  position: relative;
+  height: 100%;
+  border-top: 1px solid rgb(255 217 161 / 0.35);
+}
+
+.p11-list > li:nth-child(10n) .p11-row {
+  border-bottom: 1px solid rgb(255 217 161 / 0.35);
+}
+
+/* The top five sit in sand discs. */
+.p11-badge {
+  position: absolute;
+  left: 0;
+  top: 2.27cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.19cqw;
+  height: 3.19cqw;
+  border-radius: 999px;
+  background: var(--color-sand-storm);
+  font-size: 1.348cqw;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: #0a0a0a;
+}
+
+.p11-rank {
+  position: absolute;
+  left: 0;
+  top: 2.94cqw;
+  font-size: 1.838cqw;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--color-sand-storm);
+}
+
+.p11-name {
+  position: absolute;
+  left: 5.39cqw;
+  top: 1.45cqw;
+  font-size: 2.022cqw;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.p11-meta {
+  position: absolute;
+  left: 5.39cqw;
+  top: 4.39cqw;
+  font-size: 1.348cqw;
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: -0.0155em;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.6);
+}

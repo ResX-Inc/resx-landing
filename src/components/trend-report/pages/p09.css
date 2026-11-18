@@ -1,0 +1,30 @@
+/* 09 · Hillstone. Sizes are Figma px ÷ 8.16 (cqw). */
+
+/*
+ * The "1,800+" panel. Figma gives it a Glass effect (frost radius 26), which
+ * CSS approximates with a backdrop blur behind the translucent fill.
+ */
+.p09-panel {
+  border-radius: 1.72cqw;
+  background: rgb(20 20 20 / 0.5);
+  box-shadow: inset 0 0 0 1px #262626;
+  backdrop-filter: blur(1.59cqw);
+}
+
+/* Small tracked caps (9.5px semibold). */
+.p09-caps {
+  font-size: max(5px, 1.164cqw);
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.4);
+}
+
+/* One "+ name" row of the comparison list, 34px tall with a top hairline. */
+.p09-row {
+  position: relative;
+  height: 4.17cqw;
+  box-shadow: inset 0 1px 0 #262626;
+}

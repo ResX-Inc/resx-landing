@@ -1,0 +1,11 @@
+---
+import { TrendReport } from "@/components/trend-report/TrendReport";
+import PageLayout from "@/layouts/PageLayout.astro";
+---
+
+<PageLayout
+  title="The ResX Pulse 2026 | ResX"
+  description="What New York couldn’t get enough of in 2026: the hardest tables to get, the most popular restaurants and how the city went out, from ResX reservation data."
+>
+  <TrendReport client:load />
+</PageLayout>

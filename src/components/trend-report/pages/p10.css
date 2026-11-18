@@ -1,0 +1,28 @@
+/* 10 · New York Doesn’t Do Reruns. Sizes are Figma px ÷ 8.16 (cqw). */
+
+/*
+ * Frost behind each ticket. The ticket itself is the exported Figma vector;
+ * Figma gives it a Glass effect (frost radius 12), approximated here by a
+ * backdrop blur on a layer with the ticket's corners and side notches cut
+ * out, plus a faint bright rim.
+ */
+.p10-frost {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.47cqw;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(0.74cqw);
+  mask-image:
+    radial-gradient(circle 1.11cqw at -0.12cqw 50%, transparent 98%, #000 100%),
+    radial-gradient(circle 1.16cqw at 100% 50%, transparent 98%, #000 100%);
+  mask-composite: intersect;
+}
+
+/* Small tracked caps on the ticket stub. */
+.p10-caps {
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

@@ -1,0 +1,67 @@
+/* 16 · Beyond Dining. Figma px ÷ 8.16 = cqw. */
+
+.p16-photo {
+  position: absolute;
+  overflow: hidden;
+}
+
+.p16-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.69);
+  pointer-events: none;
+}
+
+.p16-headline {
+  font-size: 6.127cqw;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.0561em;
+  white-space: nowrap;
+}
+
+.p16-rule {
+  height: 1px;
+  background: rgb(255 217 161 / 0.35);
+}
+
+.p16-panel {
+  position: relative;
+  height: 100%;
+  border: 1px solid #262626;
+  border-radius: 1.72cqw;
+  background: rgb(16 16 16 / 0.78);
+}
+
+.p16-title {
+  position: absolute;
+  top: 5.65cqw;
+  left: 21.08cqw;
+  width: 36.64cqw;
+  font-size: 2.941cqw;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.p16-text {
+  position: absolute;
+  top: 14.07cqw;
+  left: 21.08cqw;
+  width: 36.64cqw;
+  font-size: 1.716cqw;
+  line-height: 1.5;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.p16-stat {
+  position: absolute;
+  top: 9.51cqw;
+  right: 4.41cqw;
+  width: 21.2cqw;
+  text-align: right;
+  font-size: 6.373cqw;
+  line-height: 0.92;
+  font-weight: 700;
+  color: var(--color-sand-storm);
+}
