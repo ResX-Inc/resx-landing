@@ -5,7 +5,7 @@ import {
   GiftApiError,
   type GiftCheckoutStatus,
 } from "@/lib/gift/api";
-import { formatGiftSendAt } from "@/lib/gift/format";
+import { formatGiftSendAt, isSendingNow } from "@/lib/gift/format";
 import { formatMoney } from "@/lib/gift/plans";
 
 /**
@@ -160,7 +160,9 @@ export function GiftThanks({ sessionId }: { sessionId: string }) {
           {gift.recipientName} · {gift.recipientPhoneMasked}
         </Row>
         <Row label="Sends">
-          {formatGiftSendAt(gift.sendAt, gift.timeZone)} ({gift.timeZone})
+          {isSendingNow(gift.sendAt)
+            ? "In the next few minutes"
+            : `${formatGiftSendAt(gift.sendAt, gift.timeZone)} (${gift.timeZone})`}
         </Row>
         <Row label="Subtotal">
           {formatMoney(gift.amountSubtotal, gift.currency)}
