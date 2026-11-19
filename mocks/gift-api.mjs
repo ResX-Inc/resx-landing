@@ -67,7 +67,7 @@ const ALLOWED_CHECKOUT_KEYS = new Set([
   "buyer",
   "cardDesign",
 ]);
-const CARD_DESIGNS = new Set(["classic", "midnight", "celebration", "minimal"]);
+const CARD_DESIGNS = new Set(["holiday", "table", "bow", "city"]);
 
 createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
@@ -163,7 +163,7 @@ createServer(async (req, res) => {
         amountTax: 621,
         amountTotal: 7620,
         currency: "usd",
-        cardDesign: "classic",
+        cardDesign: "holiday",
       },
     });
   }

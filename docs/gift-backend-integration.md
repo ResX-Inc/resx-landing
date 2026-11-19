@@ -55,16 +55,17 @@ after Stripe computes tax from their billing address.
     timeZone: string;                           // IANA zone, e.g. 'America/New_York'
   };
   buyer: { name: string; email: string };
-  cardDesign?: 'classic' | 'midnight' | 'celebration' | 'minimal';   // optional; omitted = 'classic'
+  cardDesign?: 'holiday' | 'table' | 'bow' | 'city';   // optional; omitted = 'holiday'
 }
 
 // 201 response
 { checkoutSessionId: string; clientSecret: string }
 ```
 
-**`cardDesign` is a fixed enum, and those four ids are the contract.** They must match the picker
-in Figma exactly — the server rejects anything else with a 400. If the design set differs from
-these four names, say so and we change the enum; it is one line on this side plus a release.
+**`cardDesign` is a fixed enum, and those four ids are the contract.** Since 2026-11-18 they are
+the picker's own skin ids (`GIFT_SKINS` in `src/lib/gift/skins.ts`), and `buildCheckoutPayload`
+sends the picked id as it is. The server rejects anything else with a 400; adding a skin is one
+line on the server plus a release.
 
 **What the design does and does not do.** It is stored on the gift and shown back to the **buyer**
 on the thanks page and the emailed receipt, and to staff in admin. **The recipient never sees it**
@@ -110,7 +111,7 @@ The thanks page has only the session id from the return URL.
     sendAt: string;                 // ISO-8601
     timeZone: string;
     amountSubtotal: number; amountTax: number; amountTotal: number; currency: string;
-    cardDesign: 'classic' | 'midnight' | 'celebration' | 'minimal';
+    cardDesign: 'holiday' | 'table' | 'bow' | 'city';
   };
 }
 ```

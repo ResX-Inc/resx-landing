@@ -1,6 +1,7 @@
 import type { Appearance } from "@stripe/stripe-js";
 
 import type { CreateGiftCheckoutBody, GiftDurationMonths } from "./api";
+import { isGiftSkinId } from "./skins";
 
 /**
  * Where the client secret is handed from /gift-cards/buy to
@@ -14,19 +15,6 @@ export interface GiftCheckoutHandoff {
   checkoutSessionId: string;
 }
 
-/**
- * The server's cardDesign enum is classic|midnight|celebration|minimal, which
- * does not match the four designs in the picker (holiday|table|bow|city). The
- * field is optional, so nothing is sent until the two sets are reconciled —
- * filling this map and passing the result is then the only change needed.
- */
-export const FIGMA_SKIN_TO_CARD_DESIGN: Record<string, undefined> = {
-  holiday: undefined,
-  table: undefined,
-  bow: undefined,
-  city: undefined,
-};
-
 export interface GiftFormValues {
   durationMonths: number;
   recipientName: string;
@@ -36,6 +24,8 @@ export interface GiftFormValues {
   sendTime: string;
   senderName: string;
   senderEmail: string;
+  /** The picked skin id, from the order summary's hidden `cardDesign` input. */
+  cardDesign: string;
 }
 
 /** The zone the gift is scheduled against, shown on the receipt and in admin. */
@@ -81,7 +71,11 @@ export function buildCheckoutPayload(
       name: values.senderName.trim(),
       email: values.senderEmail.trim(),
     },
-    // cardDesign deliberately omitted — see FIGMA_SKIN_TO_CARD_DESIGN.
+    // An unknown value is left out rather than sent, so the server's default
+    // applies instead of a 400.
+    ...(isGiftSkinId(values.cardDesign)
+      ? { cardDesign: values.cardDesign }
+      : {}),
   };
 }
 
