@@ -1,5 +1,6 @@
 ---
 import { GiftThanks } from "@/components/gift-cards/GiftThanks";
+import { loadLargeSkinAssets } from "@/lib/gift/skinAssets";
 import PageLayout from "@/layouts/PageLayout.astro";
 
 /**
@@ -11,6 +12,7 @@ import PageLayout from "@/layouts/PageLayout.astro";
  * — so unlike the manage token it is fine in the address bar and analytics.
  */
 const sessionId = Astro.url.searchParams.get("session_id");
+const skinAssets = sessionId ? await loadLargeSkinAssets() : null;
 ---
 
 <PageLayout
@@ -19,8 +21,8 @@ const sessionId = Astro.url.searchParams.get("session_id");
 >
   <section class="container pt-34 pb-18">
     {
-      sessionId ? (
-        <GiftThanks sessionId={sessionId} client:load />
+      sessionId && skinAssets ? (
+        <GiftThanks sessionId={sessionId} assets={skinAssets} client:load />
       ) : (
         <div class="bg-card/30 flex w-full max-w-150 flex-col items-start gap-4 rounded-3xl border border-white/12 p-8">
           <h1 class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white lg:text-5xl lg:leading-[52px]">

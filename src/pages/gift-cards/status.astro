@@ -1,11 +1,15 @@
 ---
 import {
+  GiftStatus,
+  type ResendOutcome,
+} from "@/components/gift-cards/GiftStatus";
+import {
   fetchGiftManageStatus,
   GiftApiError,
   type GiftManageStatus,
 } from "@/lib/gift/api";
-import { formatGiftSendAt, giftStatusCopy } from "@/lib/gift/format";
 import { GIFT_MANAGE_COOKIE } from "@/lib/gift/manageCookie";
+import { loadLargeSkinAssets } from "@/lib/gift/skinAssets";
 import PageLayout from "@/layouts/PageLayout.astro";
 
 /**
@@ -57,16 +61,15 @@ if (token) {
   }
 }
 
-const RESEND_MESSAGES: Record<string, string> = {
-  ok: "Sent. The text goes out within five minutes.",
-  conflict: "This gift can't be resent right now.",
-  limited: "You've reached the resend limit for this gift.",
-  expired: "Your session timed out. Open the link from your receipt again.",
-  error: "Something went wrong. Please try again shortly.",
-};
-const resendMessage = resend ? RESEND_MESSAGES[resend] : null;
-
-const status = gift ? giftStatusCopy(gift.status) : null;
+const RESEND_OUTCOMES: readonly ResendOutcome[] = [
+  "ok",
+  "conflict",
+  "limited",
+  "expired",
+  "error",
+];
+const resendOutcome = RESEND_OUTCOMES.find((outcome) => outcome === resend);
+const skinAssets = gift ? await loadLargeSkinAssets() : null;
 ---
 
 <PageLayout
@@ -74,86 +77,32 @@ const status = gift ? giftStatusCopy(gift.status) : null;
   description="Check on a ResX Premium gift you sent."
 >
   <section class="container pt-34 pb-18">
-    <div
-      class="bg-card/30 flex w-full max-w-150 flex-col items-start gap-5 rounded-3xl border border-white/12 p-8"
-    >
-      {
-        gift && status ? (
-          <>
-            <div class="flex w-full flex-col gap-1.5">
-              <span class="text-[13px] leading-[18px] font-medium text-zinc-300">
-                Your gift
-              </span>
-              <h1 class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white">
-                {status.label}
-              </h1>
-              {status.detail && (
-                <p class="text-base leading-6 text-white/80">{status.detail}</p>
-              )}
-            </div>
-
-            {resendMessage && (
-              <p class="border-sand-storm/40 bg-sand-storm/10 text-sand-storm w-full rounded-xl border px-4 py-3 text-sm leading-5">
-                {resendMessage}
-              </p>
-            )}
-
-            <dl class="flex w-full flex-col gap-3 border-t border-white/8 pt-5 text-[15px] leading-[22px]">
-              <div class="flex w-full items-start justify-between gap-6">
-                <dt class="shrink-0 text-zinc-300">Gift</dt>
-                <dd class="text-right text-white/90">
-                  {gift.durationMonths} months of ResX Premium
-                </dd>
-              </div>
-              <div class="flex w-full items-start justify-between gap-6">
-                <dt class="shrink-0 text-zinc-300">For</dt>
-                <dd class="text-right text-white/90">
-                  {gift.recipientName} · {gift.recipientPhoneMasked}
-                </dd>
-              </div>
-              <div class="flex w-full items-start justify-between gap-6">
-                <dt class="shrink-0 text-zinc-300">Sends</dt>
-                <dd class="text-right text-white/90">
-                  {formatGiftSendAt(gift.sendAt, gift.timeZone)} (
-                  {gift.timeZone})
-                </dd>
-              </div>
-            </dl>
-
-            {gift.canResend && (
-              <form
-                method="post"
-                action="/api/gift/resend"
-                class="w-full border-t border-white/8 pt-5"
-              >
-                <button
-                  type="submit"
-                  class="focus-visible:ring-ring h-11 cursor-pointer rounded-full border border-white/20 px-6 text-sm leading-5 font-semibold text-white transition-colors hover:border-white/40 focus-visible:ring-1 focus-visible:outline-none"
-                >
-                  Resend the text
-                </button>
-              </form>
-            )}
-          </>
-        ) : (
-          <>
-            <h1 class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white">
-              This link isn't valid
-            </h1>
-            <p class="text-base leading-6 text-white/80">
-              {unavailable && !token
-                ? "Open the link from your receipt email to see your gift."
-                : "This link has expired or doesn't match a gift. Open the most recent link from your receipt email."}
-            </p>
-            <a
-              href="/gift-cards"
-              class="text-sand-storm text-sm leading-5 font-semibold underline-offset-4 hover:underline"
-            >
-              Back to gift cards
-            </a>
-          </>
-        )
-      }
-    </div>
+    {
+      gift && skinAssets ? (
+        <GiftStatus
+          gift={gift}
+          assets={skinAssets}
+          resend={resendOutcome ?? null}
+          client:load
+        />
+      ) : (
+        <div class="bg-card/30 flex w-full max-w-150 flex-col items-start gap-4 rounded-3xl border border-white/12 p-8">
+          <h1 class="font-display text-[34px] leading-[38px] font-normal tracking-[-0.68px] text-white lg:text-5xl lg:leading-[52px]">
+            This link isn't valid
+          </h1>
+          <p class="text-base leading-6 text-white/80">
+            {unavailable && !token
+              ? "Open the link from your receipt email to see your gift."
+              : "This link has expired or doesn't match a gift. Open the most recent link from your receipt email."}
+          </p>
+          <a
+            href="/gift-cards"
+            class="text-sand-storm text-sm leading-5 font-semibold underline-offset-4 hover:underline"
+          >
+            Back to gift cards
+          </a>
+        </div>
+      )
+    }
   </section>
 </PageLayout>

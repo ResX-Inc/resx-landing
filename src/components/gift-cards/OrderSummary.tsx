@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { GiftCheck, GiftCheckBadge } from "@/icons";
@@ -17,6 +17,73 @@ import {
 import { cn } from "@/lib/utils";
 
 import { CardSkin } from "./CardSkin";
+import { GiftFlipCard } from "./GiftFlipCard";
+import { firstNameOf } from "./GiftPageParts";
+
+/** The form fields that appear on the card's back. */
+const NOTE_FIELDS = ["recipientName", "message", "senderName"] as const;
+type NoteField = (typeof NOTE_FIELDS)[number];
+type NoteValues = Record<NoteField, string>;
+
+const isNoteField = (target: EventTarget | null): boolean =>
+  (target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement) &&
+  (NOTE_FIELDS as readonly string[]).includes(target.name);
+
+/**
+ * Follows the note fields in the surrounding form, which lives outside this
+ * island (GiftForm.astro), and reports whether one of them has focus. Moving
+ * between two note fields is one stretch of focus, so the card does not
+ * flicker between them.
+ */
+function useFormNote(
+  anchor: React.RefObject<HTMLElement | null>,
+  onNoteFocusChange: (focused: boolean) => void,
+): NoteValues {
+  const [values, setValues] = useState<NoteValues>({
+    recipientName: "",
+    message: "",
+    senderName: "",
+  });
+  const focusHandler = useRef(onNoteFocusChange);
+  focusHandler.current = onNoteFocusChange;
+
+  useEffect(() => {
+    const form = anchor.current?.closest("form");
+    if (!form) return;
+    const read = () => {
+      const data = new FormData(form);
+      setValues({
+        recipientName: String(data.get("recipientName") ?? ""),
+        message: String(data.get("message") ?? ""),
+        senderName: String(data.get("senderName") ?? ""),
+      });
+    };
+    const onInput = (event: Event) => {
+      if (isNoteField(event.target)) read();
+    };
+    const onFocus = (event: FocusEvent) => {
+      if (isNoteField(event.target)) focusHandler.current(true);
+    };
+    const onBlur = (event: FocusEvent) => {
+      if (isNoteField(event.target) && !isNoteField(event.relatedTarget)) {
+        focusHandler.current(false);
+      }
+    };
+    // Picks up values the browser restored or autofilled before hydration.
+    read();
+    form.addEventListener("input", onInput);
+    form.addEventListener("focusin", onFocus);
+    form.addEventListener("focusout", onBlur);
+    return () => {
+      form.removeEventListener("input", onInput);
+      form.removeEventListener("focusin", onFocus);
+      form.removeEventListener("focusout", onBlur);
+    };
+  }, [anchor]);
+
+  return values;
+}
 
 /**
  * Section label. Mobile promotes these to real headings alongside "Who it's
@@ -128,12 +195,28 @@ export function OrderSummary({
     initialDurationMonths,
   );
   const [skinId, setSkinId] = useState<GiftSkinId>(DEFAULT_SKIN_ID);
+  // Two sources decide which side shows. `chosenBack` is the side they picked by
+  // pressing the card; `peeking` shows the note only while a note field has
+  // focus, then hands back to their choice.
+  const [chosenBack, setChosenBack] = useState(false);
+  const [peeking, setPeeking] = useState(false);
+  const flipped = peeking || chosenBack;
+  const asideRef = useRef<HTMLElement>(null);
+  const note = useFormNote(asideRef, setPeeking);
+
+  // Pressing the card is a deliberate choice: it ends any peek, so pressing
+  // it while it peeks turns it to the front and keeps it there.
+  const chooseSide = (back: boolean) => {
+    setPeeking(false);
+    setChosenBack(back);
+  };
 
   const plan = findGiftPlan(plans, durationMonths) ?? defaultGiftPlan(plans);
   const skin = GIFT_SKINS.find((s) => s.id === skinId) ?? GIFT_SKINS[0];
 
   return (
     <aside
+      ref={asideRef}
       className={cn(
         "flex w-full flex-col items-start gap-7",
         // Only desktop wraps the pickers in a card; on mobile they are plain
@@ -153,12 +236,27 @@ export function OrderSummary({
       <input type="hidden" name="cardDesign" value={skinId} />
 
       {/* The large preview is desktop-only; mobile reads selection off the grid. */}
-      <CardSkin
-        skin={skin}
-        assets={assets}
-        label={`${skin.name} gift card design`}
-        className="aspect-[366/209] w-full rounded-2xl border border-white/14 shadow-[0px_10px_28px_0px_rgba(0,0,0,0.4)] max-lg:hidden"
-      />
+      <div className="flex w-full flex-col items-center gap-2.5 max-lg:hidden">
+        <div className="@container relative aspect-[366/209] w-full">
+          <GiftFlipCard
+            skin={skin}
+            assets={assets}
+            flipped={flipped}
+            onFlippedChange={chooseSide}
+            sheenKey={skinId}
+            firstName={firstNameOf(note.recipientName)}
+            durationMonths={plan?.durationMonths ?? 12}
+            message={note.message}
+            buyerName={note.senderName}
+            editing
+          />
+        </div>
+        <span className="text-[13px] leading-[18px] text-zinc-300/60">
+          {flipped
+            ? "Tap the card to see the design"
+            : "Tap the card to see your note"}
+        </span>
+      </div>
 
       <div className="flex w-full flex-col items-start gap-2.5 max-lg:gap-4">
         <PickerLabel id="gift-card-design-label">Card design</PickerLabel>
@@ -176,7 +274,10 @@ export function OrderSummary({
                 role="radio"
                 aria-checked={selected}
                 aria-label={candidate.name}
-                onClick={() => setSkinId(candidate.id)}
+                onClick={() => {
+                  setSkinId(candidate.id);
+                  chooseSide(false);
+                }}
                 className={cn(
                   "relative aspect-[85/48.571] w-full min-w-0 cursor-pointer overflow-hidden rounded-lg transition-colors lg:flex-1",
                   "focus-visible:ring-ring focus-visible:ring-1 focus-visible:outline-none",
