@@ -149,11 +149,7 @@ export function OrderSummary({
           value={plan.durationMonths}
         />
       )}
-      {/*
-        The server's cardDesign enum is classic|midnight|celebration|minimal,
-        which does not match these Figma ids — so this value is not yet
-        submitted to the API. The field is optional server-side.
-      */}
+      {/* Sent to the API as `cardDesign`; the ids are the server's enum. */}
       <input type="hidden" name="cardDesign" value={skinId} />
 
       {/* The large preview is desktop-only; mobile reads selection off the grid. */}

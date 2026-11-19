@@ -9,15 +9,17 @@
  * are ever annotated, replace these with generated types.
  */
 
+import type { GiftSkinId } from "./skins";
+
 export const GIFT_DURATIONS = [3, 6, 12] as const;
 export type GiftDurationMonths = (typeof GIFT_DURATIONS)[number];
 
 /**
- * The server's enum. These ids do NOT currently match the four designs in the
- * Figma picker (holiday / table / bow / city), so nothing sends this field yet
- * — it is optional, and omitting it keeps the server's default.
+ * The server's `cardDesign` enum is the picker's own skin ids (resx-app
+ * `WEB_GIFT_CARD_DESIGNS`, 2026-11-18), so one type serves both. Adding a skin
+ * is a change there too: the server rejects an id it does not know with a 400.
  */
-export type GiftCardDesign = "classic" | "midnight" | "celebration" | "minimal";
+export type GiftCardDesign = GiftSkinId;
 
 export interface GiftCatalogOption {
   durationMonths: GiftDurationMonths;
@@ -176,7 +178,7 @@ export interface CreateGiftCheckoutBody {
     timeZone: string;
   };
   buyer: { name: string; email: string };
-  /** Omitted until the server enum matches the Figma picker. */
+  /** Omitted means the server's default, `holiday`. */
   cardDesign?: GiftCardDesign;
 }
 

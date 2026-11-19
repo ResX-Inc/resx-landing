@@ -68,9 +68,9 @@ const initialDurationMonths = parseDurationMonths(
   <section class="container pt-34 pb-18">
     {
       /*
-      No action yet: the real flow POSTs to /api/gifts/checkout-session and
-      mounts Stripe Elements, which is blocked on the cardDesign enum. `post`
-      keeps the entered details out of the URL in the meantime.
+      No action: the script below POSTs to /api/gifts/checkout-session and
+      hands off to /gift-cards/checkout. `post` keeps the entered details out
+      of the URL if the script never runs.
     */
     }
     <form
@@ -297,6 +297,7 @@ const initialDurationMonths = parseDurationMonths(
       sendTime: String(data.get("sendTime") ?? ""),
       senderName: String(data.get("senderName") ?? ""),
       senderEmail: String(data.get("senderEmail") ?? ""),
+      cardDesign: String(data.get("cardDesign") ?? ""),
     };
 
     try {
@@ -311,9 +312,8 @@ const initialDurationMonths = parseDurationMonths(
         JSON.stringify({
           clientSecret: session.clientSecret,
           checkoutSessionId: session.checkoutSessionId,
-          // Local only: the chosen artwork is not yet sent to the server, but
-          // the checkout page still shows it on the order line.
-          cardDesign: String(data.get("cardDesign") ?? ""),
+          // The checkout page shows the chosen artwork on the order line.
+          cardDesign: values.cardDesign,
         }),
       );
       window.location.assign("/gift-cards/checkout");

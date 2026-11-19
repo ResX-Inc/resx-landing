@@ -179,3 +179,7 @@ export type GiftSkinId = (typeof GIFT_SKINS)[number]["id"];
 
 /** The design shows the Holiday skin selected. */
 export const DEFAULT_SKIN_ID: GiftSkinId = "holiday";
+
+export function isGiftSkinId(value: unknown): value is GiftSkinId {
+  return GIFT_SKINS.some((skin) => skin.id === value);
+}
