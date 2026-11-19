@@ -1,44 +1,12 @@
 ---
-import { getImage } from "astro:assets";
-
-import bowBackdrop from "@/assets/gift/skins/bow-backdrop.png";
-import bowCopper from "@/assets/gift/skins/bow-copper.png";
-import bowRibbons from "@/assets/gift/skins/bow-ribbons.png";
-import citySkyline from "@/assets/gift/skins/city-skyline.png";
-import holidayRibbon from "@/assets/gift/skins/holiday-ribbon.png";
-import holidayWreath from "@/assets/gift/skins/holiday-wreath.png";
-import logotypeBronze from "@/assets/gift/skins/logotype-bronze.png";
-import logotypeSand from "@/assets/gift/skins/logotype-sand.png";
-import tablePasta from "@/assets/gift/skins/table-pasta.png";
 import GiftForm from "@/components/gift-cards/GiftForm.astro";
 import { OrderSummary } from "@/components/gift-cards/OrderSummary";
 import { getGiftCatalog } from "@/lib/gift/catalog";
 import { buildGiftPlans, parseDurationMonths } from "@/lib/gift/plans";
-import type { SkinAssets } from "@/lib/gift/skins";
+import { loadLargeSkinAssets } from "@/lib/gift/skinAssets";
 import PageLayout from "@/layouts/PageLayout.astro";
 
-/**
- * The skin artwork is exported from Figma at full resolution (the city photo
- * alone is 2731x4096). The card preview is only 366px wide, so each layer is
- * resized here and the island receives plain URLs — React has no access to
- * Astro's image pipeline.
- *
- * Widths are the layer's share of the 366px preview, doubled for retina.
- */
-const optimize = async (src: ImageMetadata, width: number) =>
-  (await getImage({ src, width, format: "webp" })).src;
-
-const skinAssets: SkinAssets = {
-  holidayWreath: await optimize(holidayWreath, 462),
-  holidayRibbon: await optimize(holidayRibbon, 1376),
-  tablePasta: await optimize(tablePasta, 1010),
-  logotypeSand: await optimize(logotypeSand, 280),
-  bowBackdrop: await optimize(bowBackdrop, 750),
-  logotypeBronze: await optimize(logotypeBronze, 356),
-  bowCopper: await optimize(bowCopper, 396),
-  bowRibbons: await optimize(bowRibbons, 408),
-  citySkyline: await optimize(citySkyline, 732),
-};
+const skinAssets = await loadLargeSkinAssets();
 
 // Prices come from the catalog, never from the page.
 const catalog = await getGiftCatalog();
@@ -124,6 +92,7 @@ const initialDurationMonths = parseDurationMonths(
   import {
     buildCheckoutPayload,
     GIFT_CHECKOUT_HANDOFF,
+    type GiftCheckoutHandoff,
     type GiftFormValues,
   } from "@/lib/gift/checkout";
 
@@ -314,7 +283,10 @@ const initialDurationMonths = parseDurationMonths(
           checkoutSessionId: session.checkoutSessionId,
           // The checkout page shows the chosen artwork on the order line.
           cardDesign: values.cardDesign,
-        }),
+          // The Thanks page writes these on the back of the card.
+          message: values.message,
+          buyerName: values.senderName,
+        } satisfies GiftCheckoutHandoff),
       );
       window.location.assign("/gift-cards/checkout");
     } catch (error) {

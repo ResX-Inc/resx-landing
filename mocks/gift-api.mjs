@@ -33,6 +33,7 @@ const pollCounts = new Map();
 
 const VALID_MANAGE_TOKEN = process.env.MOCK_MANAGE_TOKEN || "good-token";
 let resendCount = 0;
+let resent = false;
 
 function send(res, status, body, extraHeaders = {}) {
   const payload = body === undefined ? "" : JSON.stringify(body);
@@ -140,56 +141,111 @@ createServer(async (req, res) => {
     });
   }
 
+  // The buyer's note on the card's back. A scenario word changes it:
+  //   nonote   the buyer left no message (both fields empty)
+  //   legacy   an API that predates the note (fields left out)
+  const noteFor = (scenario, firstName) => {
+    if (scenario.includes("legacy")) return {};
+    if (scenario.includes("nonote")) return { message: "", buyerName: "" };
+    return {
+      message: `Happy birthday, ${firstName}! Dinner's on me this year, pick somewhere good.`,
+      buyerName: "Sam Okafor",
+    };
+  };
+
   const statusMatch = path.match(/^\/api\/gifts\/checkout-session\/(.+)$/);
   if (req.method === "GET" && statusMatch) {
     const id = decodeURIComponent(statusMatch[1]);
     if (!id.startsWith("cs_")) return send(res, 404, { statusCode: 404 });
 
+    // Words in the session id pick the scenario, so the Thanks page can be
+    // tried without Stripe: /gift-cards/thanks?session_id=cs_test_now_city
+    //   expired | open | stuck        checkout expired, unpaid, never lands
+    //   now                           sends immediately (default: tomorrow)
+    //   holiday | table | bow | city  the card design (default: holiday)
+    //   3m | 6m | 12m                 the gift length (default: 6 months)
+    //   nonote | legacy               see noteFor above
+    if (id.includes("expired")) {
+      return send(res, 200, { status: "expired", gift: null });
+    }
+    if (id.includes("open")) {
+      return send(res, 200, { status: "open", gift: null });
+    }
+
     const seen = (pollCounts.get(id) || 0) + 1;
     pollCounts.set(id, seen);
 
-    if (seen <= POLLS_BEFORE_GIFT) {
+    if (id.includes("stuck") || seen <= POLLS_BEFORE_GIFT) {
       return send(res, 200, { status: "complete", gift: null });
     }
+    const months = Number(id.match(/(3|6|12)m/)?.[1] ?? 6);
+    const subtotal =
+      CATALOG.options.find((option) => option.durationMonths === months)
+        ?.unitAmount ?? 6999;
+    const tax = Math.round(subtotal * 0.08875);
     return send(res, 200, {
       status: "complete",
       gift: {
-        durationMonths: 6,
-        recipientName: "Jordan Ellis",
+        durationMonths: months,
+        recipientName: "Jane Ellis",
         recipientPhoneMasked: "•••• 0142",
-        sendAt: new Date(Date.now() + 86_400_000).toISOString(),
+        sendAt: id.includes("now")
+          ? new Date().toISOString()
+          : new Date(Date.now() + 86_400_000).toISOString(),
         timeZone: "America/New_York",
-        amountSubtotal: 6999,
-        amountTax: 621,
-        amountTotal: 7620,
+        amountSubtotal: subtotal,
+        amountTax: tax,
+        amountTotal: subtotal + tax,
         currency: "usd",
-        cardDesign: "holiday",
+        cardDesign:
+          [...CARD_DESIGNS].find((design) => id.includes(design)) ?? "holiday",
+        ...noteFor(id, "Jane"),
       },
     });
   }
 
   if (req.method === "GET" && path === "/api/gifts/manage") {
-    const token = url.searchParams.get("token");
-    if (token !== VALID_MANAGE_TOKEN)
+    // Words after the token pick the scenario, e.g. `good-token-scheduled-city`:
+    // a status (default sent) and a card design (default holiday).
+    const token = url.searchParams.get("token") ?? "";
+    if (!token.startsWith(VALID_MANAGE_TOKEN))
       return send(res, 404, { statusCode: 404 });
+    const status = resent
+      ? "scheduled"
+      : (["scheduled", "sent", "claimed", "redeemed", "voided"].find((word) =>
+          token.includes(word),
+        ) ?? "sent");
     return send(res, 200, {
-      status: "sent",
+      status,
       durationMonths: 6,
       recipientName: "Jordan Ellis",
       recipientPhoneMasked: "•••• 0142",
-      sendAt: new Date(Date.now() - 3_600_000).toISOString(),
+      sendAt:
+        status === "scheduled"
+          ? new Date(
+              Date.now() + (resent ? 60_000 : 2 * 86_400_000),
+            ).toISOString()
+          : new Date(Date.now() - 3_600_000).toISOString(),
       timeZone: "America/New_York",
-      canResend: resendCount < 3,
+      canResend: status === "sent" && resendCount < 3,
+      cardDesign:
+        [...CARD_DESIGNS].find((design) => token.includes(design)) ?? "holiday",
+      ...noteFor(token, "Jordan"),
     });
   }
 
   if (req.method === "POST" && path === "/api/gifts/manage/resend") {
     const body = await readBody(req);
-    if (body.token !== VALID_MANAGE_TOKEN) {
+    if (!String(body.token ?? "").startsWith(VALID_MANAGE_TOKEN)) {
       return send(res, 404, { statusCode: 404 });
     }
     resendCount += 1;
     if (resendCount > 3) return send(res, 429, { statusCode: 429 });
+    // A resend puts the gift back to scheduled, due now, as the server does.
+    resent = true;
+    setTimeout(() => {
+      resent = false;
+    }, 20_000);
     return send(res, 202, undefined);
   }
 

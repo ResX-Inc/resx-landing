@@ -47,6 +47,13 @@ export interface GiftCheckoutStatus {
     amountTotal: number;
     currency: string;
     cardDesign: GiftCardDesign;
+    /**
+     * The buyer's note for the card's back. Optional only until the API that
+     * returns it is deployed everywhere; until then the page falls back to
+     * what this tab saved at checkout, if anything.
+     */
+    message?: string;
+    buyerName?: string;
   };
 }
 
@@ -58,6 +65,18 @@ export interface GiftManageStatus {
   sendAt: string;
   timeZone: string;
   canResend: boolean;
+  /**
+   * The card the buyer picked. Optional only until the API that returns it
+   * is deployed everywhere; a missing one shows the default card.
+   */
+  cardDesign?: GiftCardDesign;
+  /**
+   * The buyer's note for the card's back. Optional only until the API that
+   * returns it is deployed everywhere; until then the page falls back to
+   * what this tab saved at checkout, if anything.
+   */
+  message?: string;
+  buyerName?: string;
 }
 
 /**

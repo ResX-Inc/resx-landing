@@ -13,6 +13,52 @@ export const GIFT_CHECKOUT_HANDOFF = "resx.gift.checkout";
 export interface GiftCheckoutHandoff {
   clientSecret: string;
   checkoutSessionId: string;
+  /** The picked skin id; the checkout page shows it on the order line. */
+  cardDesign?: string;
+  /**
+   * For the note on the back of the Thanks page card. No endpoint returns the
+   * buyer's message, so it stays in this tab, never in the URL or a log.
+   */
+  message?: string;
+  buyerName?: string;
+}
+
+/** The buyer's note for a checkout session, read on the Thanks page. */
+export interface GiftNote {
+  message: string;
+  buyerName: string;
+}
+
+/**
+ * The note as the API returns it, or null from an API that does not return
+ * it yet. An empty message or name is a real answer: the buyer left none.
+ */
+export function giftNoteFrom(gift: {
+  message?: string;
+  buyerName?: string;
+}): GiftNote | null {
+  if (gift.message === undefined && gift.buyerName === undefined) return null;
+  return { message: gift.message ?? "", buyerName: gift.buyerName ?? "" };
+}
+
+/**
+ * The note saved for `checkoutSessionId` in this tab, or null when the tab
+ * holds none or holds a different purchase's: the Thanks page can be opened
+ * from the receipt email in another tab, where there is nothing to show.
+ */
+export function readGiftNote(checkoutSessionId: string): GiftNote | null {
+  try {
+    const raw = sessionStorage.getItem(GIFT_CHECKOUT_HANDOFF);
+    if (!raw) return null;
+    const handoff = JSON.parse(raw) as Partial<GiftCheckoutHandoff>;
+    if (handoff.checkoutSessionId !== checkoutSessionId) return null;
+    return {
+      message: handoff.message?.trim() ?? "",
+      buyerName: handoff.buyerName?.trim() ?? "",
+    };
+  } catch {
+    return null;
+  }
 }
 
 export interface GiftFormValues {
